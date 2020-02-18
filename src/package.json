@@ -1,0 +1,9 @@
+{
+  "scripts": {
+    "watch": "watchify js/main.js -o dist/bundle.js -v",
+    "build": "browserify js/main.js | uglifyjs -mc > dist/bundle.js"
+  },
+  "dependencies": {
+    "three": "^0.113.2"
+  }
+}
