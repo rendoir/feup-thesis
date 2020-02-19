@@ -28,7 +28,7 @@ function init() {
     for (var i = 0; i < LEVELS_OF_DETAIL; i++) {
         // make a row item
         var row_element = document.createElement("div");
-        row_element.className = 'storyboard-row';
+        row_element.classList.add('storyboard-row', 'd-flex', 'justify-content-center');
         content.appendChild(row_element);
         storyboard[i] = [];
 
