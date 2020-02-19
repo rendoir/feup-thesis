@@ -2,7 +2,7 @@ var THREE = require('three');
 
 var canvas, renderer;
 const FRAMES_PER_ROW = 5;
-const LEVELS_OF_DETAIL = 2;
+const LEVELS_OF_DETAIL = 10;
 
 // Storyboard is an array of rows (levels-of-detail)
 // Each row is an array of frames (which have a scene)
@@ -28,7 +28,7 @@ function init() {
     for (var i = 0; i < LEVELS_OF_DETAIL; i++) {
         // make a row item
         var row_element = document.createElement("div");
-        row_element.classList.add('storyboard-row', 'd-flex', 'justify-content-center');
+        row_element.classList.add('storyboard-row', 'd-flex');
         content.appendChild(row_element);
         storyboard[i] = [];
 
@@ -105,7 +105,7 @@ function render() {
 
     updateSize();
 
-    canvas.style.transform = `translateY(${window.scrollY}px)`;
+    canvas.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
 
     renderer.setClearColor(0xffffff);
     renderer.setScissorTest(false);

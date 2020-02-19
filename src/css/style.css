@@ -13,8 +13,6 @@ a {
 }
 
 #content {
-    position: absolute;
-    top: 0; width: 100%;
     z-index: 1;
 }
 
@@ -26,6 +24,7 @@ a {
 }
 
 .list-item {
+    position: relative;
     display: inline-block;
     border: solid thin #444;
 }
@@ -44,5 +43,6 @@ a {
 }
 
 .storyboard-row {
-    display: block;
+    /*margin-left:auto;*/
+    /*margin-right:auto;*/
 }
