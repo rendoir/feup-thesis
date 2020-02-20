@@ -8,12 +8,9 @@ body {
     margin: 0;
 }
 
-a {
-    color: #08f;
-}
-
 #content {
-    z-index: 1;
+    display: flex;
+    flex-wrap:wrap
 }
 
 #canvas {
@@ -43,6 +40,6 @@ a {
 }
 
 .storyboard-row {
-    /*margin-left:auto;*/
-    /*margin-right:auto;*/
+    margin-left:auto;
+    margin-right:auto;
 }
