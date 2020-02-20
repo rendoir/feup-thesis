@@ -1,4 +1,4 @@
-var THREE = require('three');
+const THREE = require('three');
 
 var canvas, renderer;
 const FRAMES_PER_ROW = 5;
