@@ -9,8 +9,8 @@ body {
 }
 
 #content {
-    display: flex;
-    flex-wrap:wrap
+    text-align: center;
+    white-space: nowrap;
 }
 
 #canvas {
@@ -41,7 +41,5 @@ body {
 }
 
 .storyboard-row {
-    display: flex;
-    margin-left:auto;
-    margin-right:auto;
+
 }
