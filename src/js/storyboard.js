@@ -6,6 +6,8 @@ class Storyboard {
     }
 
     _initFrames() {
+        // Array of initial frames (depth = 0)
+        // Each frame contains its child frames
         this.frames = [];
 
         // Mock frames

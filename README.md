@@ -6,7 +6,7 @@ Master Thesis in Informatics and Computing Engineering
 
 ### Prerequisites
 ```
-yarn global add browserify watchify uglify-es
+yarn global add browserify watchify uglify-es node-sass
 ```
 
 ### Running
