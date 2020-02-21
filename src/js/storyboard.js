@@ -22,8 +22,6 @@ class Storyboard {
         let frame2_2 = new Frame(); frame2.childFrames.push(frame2_2);
         let frame2_3 = new Frame(); frame2.childFrames.push(frame2_3);
         let frame2_4 = new Frame(); frame2.childFrames.push(frame2_4);
-
-        console.log(this.frames);
     }
 }
 

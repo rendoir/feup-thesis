@@ -21,23 +21,23 @@ body {
     z-index: -1; // For elements to appear on top of the canvas
 }
 
-.list-item {
+.storyboard-frame {
     position: relative;
     display: inline-block;
     border: solid thin #444;
-}
 
-.list-item .scene {
-    width: 200px;
-    height: 200px;
-}
+    .scene {
+        width: 200px;
+        height: 200px;
+    }
 
-.list-item .description {
-    color: #888;
-    font-family: sans-serif;
-    font-size: large;
-    width: 200px;
-    margin-top: 0.5em;
+    .description {
+        color: #888;
+        font-family: sans-serif;
+        font-size: large;
+        width: 200px;
+        margin-top: 0.5em;
+    }
 }
 
 .storyboard-row {

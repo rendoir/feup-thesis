@@ -51,7 +51,7 @@ function init() {
     
             // make a list item
             var element = document.createElement("div");
-            element.className = "list-item";
+            element.className = "storyboard-frame";
             element.innerHTML = template_frame.replace('$', j + 1);
     
             // Look up the element that represents the area
