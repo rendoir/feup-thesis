@@ -11,8 +11,8 @@ body {
 
 /* Content */
 #content {
-    text-align: center;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
 }
 
 #canvas {
@@ -43,10 +43,19 @@ body {
 }
 
 .storyboard-row {
-    position: relative;
+    display: flex;
+    align-items:center;
+    margin-left:auto;
+    margin-right:auto;
+}
+
+.row-frames {
+    display: inherit;
 }
 
 /* Buttons */
 .btn-nav {
     font-size: 2rem;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
