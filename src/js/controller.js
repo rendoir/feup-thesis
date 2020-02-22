@@ -27,6 +27,23 @@ class Controller {
 
         this.renderer.setVisibleFramesInfo(visibleFramesInfo);
     }
+
+    setNavigationEvents(row) {
+        let leftButton = row.getElementsByClassName("btn-nav-left")[0];
+        leftButton.onclick = this.onNavigationClickLeft.bind(this);
+        let rightButton = row.getElementsByClassName("btn-nav-right")[0];
+        rightButton.onclick = this.onNavigationClickRight.bind(this);
+    }
+
+    onNavigationClickLeft() {
+        // TODO
+        console.log("CLICK LEFT");
+    }
+
+    onNavigationClickRight() {
+        // TODO
+        console.log("CLICK RIGHT");
+    }
 }
 
 module.exports = Controller;

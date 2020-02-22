@@ -15,7 +15,8 @@ class Renderer {
         this.visibleFramesInfo = [];
 
         // Init content and template
-        this.frameTemplate = document.getElementById("template_frame").text;
+        this.frameTemplate = document.getElementById("frame_template");
+        this.rowTemplate = document.getElementById('row_template');
         this.contentElement = document.getElementById("content");
 
         // Hold the scenes currently visible
@@ -27,6 +28,10 @@ class Renderer {
 
     setStoryboard(storyboard) {
         this.storyboard = storyboard;
+    }
+
+    setController(controller) {
+        this.controller = controller;
     }
 
     setVisibleFramesInfo(info) {
@@ -52,9 +57,9 @@ class Renderer {
             const info = this.visibleFramesInfo[infoIndex];
             
             // Create a new row
-            let rowElement = document.createElement("div");
-            rowElement.classList.add('storyboard-row');
+            let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
             this.contentElement.appendChild(rowElement);
+            this.controller.setNavigationEvents(rowElement);
 
             // Retrieve the correct row
             let row;
@@ -71,13 +76,12 @@ class Renderer {
                 let scene = new THREE.Scene();
         
                 // Create a frame HTML element from the template
-                let frameElement = document.createElement("div");
-                frameElement.classList.add("storyboard-frame");
-                frameElement.innerHTML = this.frameTemplate.replace('$', frame.id);
+                let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
+                frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.id);
         
                 // Save the scene element in the scene object and append the element
                 scene.userData.element = frameElement.getElementsByClassName("scene")[0];
-                rowElement.appendChild(frameElement);
+                rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
         
                 // Setup the scene camera
                 let camera = new THREE.PerspectiveCamera(50, 1, 1, 10);

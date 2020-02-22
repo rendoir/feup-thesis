@@ -10,8 +10,9 @@
 
         <link rel="stylesheet" type="text/css" href="dist/style.css">
 
-        <!-- jquery, popper and bootstrap-->
+        <!-- jquery, popper, bootstrap and fontawesome -->
         <link rel="stylesheet" type="text/css" href="node_modules/bootstrap/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" type="text/css" href="node_modules/@fortawesome/fontawesome-free/css/all.min.css">
         <script src="node_modules/jquery/dist/jquery.min.js"></script>
         <script src="node_modules/popper.js/dist/umd/popper.min.js"></script>
         <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
@@ -22,10 +23,22 @@
 		<div id="content">
 		</div>
 
-		<script id="template_frame" type="notjs">
-            <div class="description">Scene $</div>
-			<div class="scene"></div>
-        </script>
+        <!-- Frame template -->
+        <template id="frame_template">
+            <div class="storyboard-frame">
+                <div class="description">Scene $</div>
+                <div class="scene"></div>
+            </div>
+        </template>
+        
+        <!-- Row template -->
+        <template id="row_template">
+            <div class="storyboard-row">
+                <i type="button" class="btn-nav btn-nav-left fas fa-chevron-circle-left"></i>
+                <div class="row-frames d-inline-block"></div>
+                <i type="button" class="btn-nav btn-nav-right fas fa-chevron-circle-right"></i>
+            </div>
+        </template>
         
         <script src="dist/bundle.js"></script>
     </body>
