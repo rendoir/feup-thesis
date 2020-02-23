@@ -45,9 +45,8 @@ class Renderer {
 
         // Clear content
         this.scenes = [];
-        let rows = document.getElementsByClassName(Renderer.storyboardRowClassName);
-        for(let i = 0; i < rows.length; i++){
-            rows[i].parentNode.removeChild(rows[i]);
+        while (this.contentElement.firstChild) {
+            this.contentElement.removeChild(this.contentElement.firstChild);
         }
 
         // Write new content
@@ -56,8 +55,9 @@ class Renderer {
         for (let infoIndex = 0; infoIndex < this.visibleFramesInfo.length; infoIndex++) {
             const info = this.visibleFramesInfo[infoIndex];
             
-            // Create a new row
+            // Create a new row element
             let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
+            rowElement.setAttribute("data-row-id", infoIndex);
             this.contentElement.appendChild(rowElement);
             this.controller.setNavigationEvents(rowElement);
 

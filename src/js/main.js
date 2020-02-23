@@ -9,4 +9,5 @@ let controller = new Controller();
 let renderer = new Renderer();
 renderer.setStoryboard(storyboard);
 renderer.setController(controller);
+controller.setStoryboard(storyboard);
 controller.setRenderer(renderer);
