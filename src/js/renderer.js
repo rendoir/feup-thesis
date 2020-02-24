@@ -61,7 +61,7 @@ class Renderer {
             this.contentElement.appendChild(rowElement);
             this.controller.setNavigationEvents(rowElement);
 
-            // Retrieve the correct row
+            // Retrieve the correct row from the storyboard
             let row;
             if (infoIndex == 0)
                 row = this.storyboard.frames; // Initial set of frames (depth = 0)
@@ -72,16 +72,19 @@ class Renderer {
             let frames = row.slice(info.start, Math.min(info.start + Renderer.maxFramesPerPage, row.length));
 
             // Create the frame elements
+            let frameId = info.start;
             frames.forEach(frame => {
                 let scene = new THREE.Scene();
         
                 // Create a frame HTML element from the template
                 let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
                 frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.id);
+                this.controller.setFrameDetailEvents(frameElement);
+                frameElement.setAttribute("data-frame-id", frameId);
+                rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
         
                 // Save the scene element in the scene object and append the element
                 scene.userData.element = frameElement.getElementsByClassName("scene")[0];
-                rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
         
                 // Setup the scene camera
                 let camera = new THREE.PerspectiveCamera(50, 1, 1, 10);
@@ -110,6 +113,9 @@ class Renderer {
 
                 // Add scene
                 this.scenes.push(scene);
+
+                // Increment frameId
+                frameId++;
             });
             
             // Update the previous row with the current
@@ -184,9 +190,6 @@ class Renderer {
 
     // Pagination: the maximum number of frames per page
     static get maxFramesPerPage() { return 3; }
-
-    // Name of the class HTML attribute for the storyboard rows
-    static get storyboardRowClassName() { return 'storyboard-row'; }
 }
 
 module.exports = Renderer;

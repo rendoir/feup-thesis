@@ -24,10 +24,10 @@ class Controller {
             zoomedFromFrame: -1
         });
         // TODO: Remove when zoom is implemented. This is just for testing.
-        this.visibleFramesInfo.push({
+        /*this.visibleFramesInfo.push({
             start: 2,
             zoomedFromFrame: 1,
-        })
+        });*/
 
         this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
@@ -53,7 +53,7 @@ class Controller {
 
     onNavigationClickRight() {
         // Get row from the button
-        let row = event.srcElement.parentElement;
+        let row = event.target.closest(".storyboard-row");
         let rowId = row.getAttribute("data-row-id");
         
         // Increment and clamp to total number of frames
@@ -62,6 +62,33 @@ class Controller {
             this.getTotalNumberFramesInRow(rowId) - 1);
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
         this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+    }
+
+    setFrameDetailEvents(frameElement) {
+        frameElement.onclick = this.onFrameClick.bind(this);
+    }
+
+    onFrameClick(event) {
+        // Get frame and row
+        let frame = event.target.closest(".storyboard-frame");
+        let frameId = frame.getAttribute("data-frame-id");
+        let row = frame.closest(".storyboard-row");
+        let rowId = row.getAttribute("data-row-id");
+        //console.log(`Row: ${rowId} | Frame: ${frameId}`);
+
+        // Make sure row is present in the visible frames
+        let rowInfo = this.visibleFramesInfo[rowId];
+        if( rowInfo !== undefined && rowInfo !== null ) {
+            // Clear all content after (bellow) this row
+            this.visibleFramesInfo = this.visibleFramesInfo.slice(0, rowId+1);
+
+            // Add a new row
+            this.visibleFramesInfo.push({
+                start: 0,
+                zoomedFromFrame: frameId
+            });
+            this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+        }
     }
 
     getTotalNumberFramesInRow(rowId) {
