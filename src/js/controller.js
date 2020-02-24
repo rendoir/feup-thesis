@@ -80,7 +80,7 @@ class Controller {
         let rowInfo = this.visibleFramesInfo[rowId];
         if( rowInfo !== undefined && rowInfo !== null ) {
             // Clear all content after (bellow) this row
-            this.visibleFramesInfo = this.visibleFramesInfo.slice(0, rowId+1);
+            this.visibleFramesInfo = this.visibleFramesInfo.slice(0, parseInt(rowId)+1);
 
             // Add a new row
             this.visibleFramesInfo.push({
