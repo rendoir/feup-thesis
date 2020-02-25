@@ -55,12 +55,6 @@ class Renderer {
         for (let infoIndex = 0; infoIndex < this.visibleFramesInfo.length; infoIndex++) {
             const info = this.visibleFramesInfo[infoIndex];
             
-            // Create a new row element
-            let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
-            rowElement.setAttribute("data-row-id", infoIndex);
-            this.contentElement.appendChild(rowElement);
-            this.controller.setNavigationEvents(rowElement);
-
             // Retrieve the correct row from the storyboard
             let row;
             if (infoIndex == 0)
@@ -69,7 +63,16 @@ class Renderer {
 
             // Retrieve the frames for the row
             // From info start to the minimum between the total number of frames of the row and the start plus the frames per page
-            let frames = row.slice(info.start, Math.min(info.start + Renderer.maxFramesPerPage, row.length));
+            let frames = row.slice(info.start, Math.min(info.start + this.maxFramesPerPage, row.length));
+
+            // Exit if there are no frames
+            if (frames.length === 0) continue;
+
+            // Create a new row element
+            let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
+            rowElement.setAttribute("data-row-id", infoIndex);
+            this.contentElement.appendChild(rowElement);
+            this.controller.setNavigationEvents(rowElement);
 
             // Create the frame elements
             let frameId = info.start;
@@ -98,9 +101,9 @@ class Renderer {
                     new THREE.DodecahedronBufferGeometry(0.5),
                     new THREE.CylinderBufferGeometry(0.5, 0.5, 1, 12)
                 ];
-                let geometry = geometries[geometries.length * Math.random() | 0];
+                let geometry = geometries[frameId % geometries.length];
                 let material = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color().setHSL(Math.random(), 1, 0.75),
+                    color: new THREE.Color().setHSL(infoIndex / 10, 1, 0.75),
                     roughness: 0.5,
                     metalness: 0,
                     flatShading: true
@@ -182,14 +185,9 @@ class Renderer {
     
         if (this.canvas.width !== width || this.canvas.height !== height) {
             this.renderer.setSize(width, height, false);
+            this.maxFramesPerPage = Math.floor(width / 200) - 1; // Each frame has 200 pixels
         }
     }
-
-
-    /* --------------- Constants --------------- */
-
-    // Pagination: the maximum number of frames per page
-    static get maxFramesPerPage() { return 3; }
 }
 
 module.exports = Renderer;
