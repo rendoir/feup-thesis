@@ -226,6 +226,8 @@ class Renderer {
             let previousRowFrames = this.visibleFrames[i-1];
             if(rowInfo.zoomedFromFrame >= previousRowInfo.start && 
                 rowInfo.zoomedFromFrame <= previousRowFrames.frameElements.length + previousRowInfo.start - 1) {
+                    // The frame is visible -> Draw the two lines from it to the next row
+
                     // Information of the frame that was zoomed
                     let previousFrameElement = previousRowFrames.frameElements[rowInfo.zoomedFromFrame - previousRowInfo.start];
                     let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
@@ -233,22 +235,60 @@ class Renderer {
                     // Get information of the first frame in the zoomed row
                     let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
                     // Draw left line
-                    this.contextFullscreen.beginPath();
-                    this.contextFullscreen.setLineDash([5, 15]);
-                    this.contextFullscreen.moveTo(previousFrameElementRect.left, previousFrameElementRect.bottom);
-                    this.contextFullscreen.lineTo(firstFrameRect.left, firstFrameRect.top);
-                    this.contextFullscreen.stroke();
-
+                    this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                        firstFrameRect.left, firstFrameRect.top);
+                    
                     // Get information of the last frame in the zoomed row
                     let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
                     // Draw left line
-                    this.contextFullscreen.beginPath();
-                    this.contextFullscreen.setLineDash([5, 15]);
-                    this.contextFullscreen.moveTo(previousFrameElementRect.right, previousFrameElementRect.bottom);
-                    this.contextFullscreen.lineTo(lastFrameRect.right, firstFrameRect.top);
-                    this.contextFullscreen.stroke();
+                    this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                        lastFrameRect.right, firstFrameRect.top);
+                } else {
+                    // The frame is not visible -> Draw from the nearest point to the next row
+
+                    if (rowInfo.zoomedFromFrame < previousRowInfo.start) {
+                        // Select the left-most frame
+                        let previousFrameElement = previousRowFrames.frameElements[0];
+                        let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
+
+                        // Get information of the first frame in the zoomed row
+                        let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                            firstFrameRect.left, firstFrameRect.top);
+                        
+                        // Get information of the last frame in the zoomed row
+                        let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                            lastFrameRect.right, firstFrameRect.top);
+                    } else {
+                        // Select the right-most frame
+                        let previousFrameElement = previousRowFrames.frameElements[previousRowFrames.frameElements.length-1];
+                        let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
+
+                        // Get information of the first frame in the zoomed row
+                        let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                            firstFrameRect.left, firstFrameRect.top);
+                        
+                        // Get information of the last frame in the zoomed row
+                        let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                            lastFrameRect.right, firstFrameRect.top);
+                    }
                 }
         }
+    }
+
+    drawDashedLine(fromX, fromY, toX, toY) {
+        this.contextFullscreen.beginPath();
+        this.contextFullscreen.setLineDash([5, 15]);
+        this.contextFullscreen.moveTo(fromX, fromY);
+        this.contextFullscreen.lineTo(toX, toY);
+        this.contextFullscreen.stroke();
     }
 
     updateSize() {
