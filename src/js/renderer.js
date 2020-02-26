@@ -4,7 +4,9 @@ class Renderer {
     constructor() {
         // Init canvas and renderer
         this.canvas = document.getElementById("canvas");
-        this.renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+        this.canvasFullscreen = document.getElementById("canvas-fullscreen");
+        this.contextFullscreen = this.canvasFullscreen.getContext("2d");
+        this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
         this.renderer.setClearColor(0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -14,14 +16,18 @@ class Renderer {
         // and the index of the frame it's zooming from the previous row (-1 otherwise)
         this.visibleFramesInfo = [];
 
+        // Visible Frames is an array of objects
+        // The index in the array is the depth
+        // Each entry has the frame content (storyboard), frame element and scene elements
+        this.visibleFrames = [];
+
         // Init content and template
         this.frameTemplate = document.getElementById("frame_template");
         this.rowTemplate = document.getElementById('row_template');
         this.contentElement = document.getElementById("content");
 
-        // Hold the scenes currently visible
-        this.scenes = [];
-
+        this.maxFramesPerPage = 1;
+        this.needsUpdate = false;
         this.shouldRender = false;
         this.renderLoop();
     }
@@ -44,7 +50,7 @@ class Renderer {
         this.shouldRender = false;
 
         // Clear content
-        this.scenes = [];
+        this.visibleFrames = [];
         while (this.contentElement.firstChild) {
             this.contentElement.removeChild(this.contentElement.firstChild);
         }
@@ -67,6 +73,13 @@ class Renderer {
 
             // Exit if there are no frames
             if (frames.length === 0) continue;
+
+            // Init visible frames
+            let visibleFramesInRow = {
+                frameObjects: [],
+                frameElements: [],
+                scenes: []
+            };
 
             // Create a new row element
             let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
@@ -114,12 +127,17 @@ class Renderer {
                 light.position.set(1, 1, 1);
                 scene.add(light);
 
-                // Add scene
-                this.scenes.push(scene);
+                // Add to visible frame
+                visibleFramesInRow.scenes.push(scene);
+                visibleFramesInRow.frameObjects.push(frame);
+                visibleFramesInRow.frameElements.push(frameElement);
 
                 // Increment frameId
                 frameId++;
             });
+
+            // Add to visible frames
+            this.visibleFrames.push(visibleFramesInRow);
             
             // Update the previous row with the current
             previousRow = row;
@@ -137,8 +155,12 @@ class Renderer {
         // Update canvas size
         this.updateSize();
 
+        // Update elements
+        this.updateElements();
+
         // Update canvas transform with the scroll
         this.canvas.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
+        this.canvasFullscreen.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
 
         // Clear values
         this.renderer.setClearColor(0xffffff);
@@ -148,35 +170,85 @@ class Renderer {
         this.renderer.setClearColor(0xe0e0e0);
         this.renderer.setScissorTest(true);
 
+        // Clear fullscreen canvas
+        this.contextFullscreen.clearRect(0, 0, this.canvasFullscreen.width, this.canvasFullscreen.height);
+
         if (!this.shouldRender)
             return;
     
-        // Render each scene
-        this.scenes.forEach(scene => {
-            // Rotate object
-            scene.children[0].rotation.y = Date.now() * 0.001;
-    
-            // Get the position of the scene element relative to the page's viewport
-            var rect = scene.userData.element.getBoundingClientRect();
-    
-            // Check if it's offscreen. If so skip it.
-            if (rect.bottom < 0 || rect.top > this.renderer.domElement.clientHeight ||
-                rect.right < 0 || rect.left > this.renderer.domElement.clientWidth) {
-                return;
+        // Render each scene and dashed lines
+        for (let i = 0; i < this.visibleFrames.length; i++) {
+            const visibleFramesInRow = this.visibleFrames[i];
+            const rowInfo = this.visibleFramesInfo[i];
+
+            // Render scenes
+            for (let j = 0; j < visibleFramesInRow.scenes.length; j++) {
+                const scene = visibleFramesInRow.scenes[j];
+                this.renderScene(scene);
             }
-    
-            // Set the viewport
-            var width = rect.right - rect.left;
-            var height = rect.bottom - rect.top;
-            var left = rect.left;
-            var bottom = this.renderer.domElement.clientHeight - rect.bottom;
-    
-            this.renderer.setViewport(left, bottom, width, height);
-            this.renderer.setScissor(left, bottom, width, height);
-    
-            let camera = scene.userData.camera;
-            this.renderer.render(scene, camera);
-        });
+
+            // Render dashed lines
+            this.renderDashedLines(i, rowInfo, visibleFramesInRow);
+        }
+    }
+
+    renderScene(scene) {
+        // Rotate object
+        scene.children[0].rotation.y = Date.now() * 0.001;
+                
+        // Get the position of the scene element relative to the page's viewport
+        var rect = scene.userData.element.getBoundingClientRect();
+
+        // Check if it's offscreen. If so skip it.
+        if (rect.bottom < 0 || rect.top > this.renderer.domElement.clientHeight ||
+            rect.right < 0 || rect.left > this.renderer.domElement.clientWidth) {
+            return;
+        }
+
+        // Set the viewport
+        var width = rect.right - rect.left;
+        var height = rect.bottom - rect.top;
+        var left = rect.left;
+        var bottom = this.renderer.domElement.clientHeight - rect.bottom;
+
+        this.renderer.setViewport(left, bottom, width, height);
+        this.renderer.setScissor(left, bottom, width, height);
+
+        let camera = scene.userData.camera;
+        this.renderer.render(scene, camera);
+    }
+
+    renderDashedLines(i, rowInfo, visibleFramesInRow) {
+        // Skip the first row
+        if (i > 0) {
+            // Check if the frame that got zoomed is visible
+            let previousRowInfo = this.visibleFramesInfo[i-1];
+            let previousRowFrames = this.visibleFrames[i-1];
+            if(rowInfo.zoomedFromFrame >= previousRowInfo.start && 
+                rowInfo.zoomedFromFrame <= previousRowFrames.frameElements.length + previousRowInfo.start - 1) {
+                    // Information of the frame that was zoomed
+                    let previousFrameElement = previousRowFrames.frameElements[rowInfo.zoomedFromFrame - previousRowInfo.start];
+                    let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
+
+                    // Get information of the first frame in the zoomed row
+                    let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                    // Draw left line
+                    this.contextFullscreen.beginPath();
+                    this.contextFullscreen.setLineDash([5, 15]);
+                    this.contextFullscreen.moveTo(previousFrameElementRect.left, previousFrameElementRect.bottom);
+                    this.contextFullscreen.lineTo(firstFrameRect.left, firstFrameRect.top);
+                    this.contextFullscreen.stroke();
+
+                    // Get information of the last frame in the zoomed row
+                    let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                    // Draw left line
+                    this.contextFullscreen.beginPath();
+                    this.contextFullscreen.setLineDash([5, 15]);
+                    this.contextFullscreen.moveTo(previousFrameElementRect.right, previousFrameElementRect.bottom);
+                    this.contextFullscreen.lineTo(lastFrameRect.right, firstFrameRect.top);
+                    this.contextFullscreen.stroke();
+                }
+        }
     }
 
     updateSize() {
@@ -184,8 +256,21 @@ class Renderer {
         let height = this.canvas.clientHeight;
     
         if (this.canvas.width !== width || this.canvas.height !== height) {
+            this.canvasFullscreen.width = width;
+            this.canvasFullscreen.height = height;
             this.renderer.setSize(width, height, false);
-            this.maxFramesPerPage = Math.floor(width / 200) - 1; // Each frame has 200 pixels
+            let newMaxFramesPerPage = Math.max(Math.floor(width / 200) - 1, 1); // Each frame has 200 pixels
+            if (newMaxFramesPerPage !== this.maxFramesPerPage) {
+                this.maxFramesPerPage = newMaxFramesPerPage;
+                this.needsUpdate = true;
+            }
+        }
+    }
+
+    updateElements() {
+        if( this.needsUpdate ) {
+            this.onVisibleFramesInfoSet();
+            this.needsUpdate = false;
         }
     }
 }
