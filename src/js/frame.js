@@ -1,7 +1,13 @@
+/**
+ * A Frame holds the Object which suffers a transformation 
+ * in the time the frame represents 
+ */
 class Frame {
-    constructor() {
+    constructor(object, transformation) {
+        this.object = object;
+        this.transformation = transformation;
         this.childFrames = [];
-        this.id = Frame.count;
+        this.uid = Frame.count;
         Frame.count += 1;
     }
 }

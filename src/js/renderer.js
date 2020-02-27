@@ -18,7 +18,7 @@ class Renderer {
 
         // Visible Frames is an array of objects
         // The index in the array is the depth
-        // Each entry has the frame content (storyboard), frame element and scene elements
+        // Each entry has the frame content (storyboard), frame HTML element and scene elements
         this.visibleFrames = [];
 
         // Init content and template
@@ -94,7 +94,7 @@ class Renderer {
         
                 // Create a frame HTML element from the template
                 let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
-                frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.id);
+                frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.uid);
                 this.controller.setFrameDetailEvents(frameElement);
                 frameElement.setAttribute("data-frame-id", frameId);
                 rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
@@ -102,30 +102,8 @@ class Renderer {
                 // Save the scene element in the scene object and append the element
                 scene.userData.element = frameElement.getElementsByClassName("scene")[0];
         
-                // Setup the scene camera
-                let camera = new THREE.PerspectiveCamera(50, 1, 1, 10);
-                camera.position.z = 2;
-                scene.userData.camera = camera;
-        
-                // Add a random mesh and material to the scene and lights
-                let geometries = [
-                    new THREE.BoxBufferGeometry(1, 1, 1),
-                    new THREE.SphereBufferGeometry(0.5, 12, 8),
-                    new THREE.DodecahedronBufferGeometry(0.5),
-                    new THREE.CylinderBufferGeometry(0.5, 0.5, 1, 12)
-                ];
-                let geometry = geometries[frameId % geometries.length];
-                let material = new THREE.MeshStandardMaterial({
-                    color: new THREE.Color().setHSL(infoIndex / 10, 1, 0.75),
-                    roughness: 0.5,
-                    metalness: 0,
-                    flatShading: true
-                });
-                scene.add(new THREE.Mesh(geometry, material));
-                scene.add(new THREE.HemisphereLight(0xaaaaaa, 0x444444));
-                var light = new THREE.DirectionalLight(0xffffff, 0.5);
-                light.position.set(1, 1, 1);
-                scene.add(light);
+                // Setup the scene
+                this.setupScene(scene, frameId, infoIndex);
 
                 // Add to visible frame
                 visibleFramesInRow.scenes.push(scene);
@@ -289,6 +267,62 @@ class Renderer {
         this.contextFullscreen.moveTo(fromX, fromY);
         this.contextFullscreen.lineTo(toX, toY);
         this.contextFullscreen.stroke();
+    }
+
+    setupScene(scene, frameId, infoIndex) {
+        // California shape
+        var californiaPts = [];
+
+        californiaPts.push( new THREE.Vector2( 610, 320 ) );
+        californiaPts.push( new THREE.Vector2( 450, 300 ) );
+        californiaPts.push( new THREE.Vector2( 392, 392 ) );
+        californiaPts.push( new THREE.Vector2( 266, 438 ) );
+        californiaPts.push( new THREE.Vector2( 190, 570 ) );
+        californiaPts.push( new THREE.Vector2( 190, 600 ) );
+        californiaPts.push( new THREE.Vector2( 160, 620 ) );
+        californiaPts.push( new THREE.Vector2( 160, 650 ) );
+        californiaPts.push( new THREE.Vector2( 180, 640 ) );
+        californiaPts.push( new THREE.Vector2( 165, 680 ) );
+        californiaPts.push( new THREE.Vector2( 150, 670 ) );
+        californiaPts.push( new THREE.Vector2( 90, 737 ) );
+        californiaPts.push( new THREE.Vector2( 80, 795 ) );
+        californiaPts.push( new THREE.Vector2( 50, 835 ) );
+        californiaPts.push( new THREE.Vector2( 64, 870 ) );
+        californiaPts.push( new THREE.Vector2( 60, 945 ) );
+        californiaPts.push( new THREE.Vector2( 300, 945 ) );
+        californiaPts.push( new THREE.Vector2( 300, 743 ) );
+        californiaPts.push( new THREE.Vector2( 600, 473 ) );
+        californiaPts.push( new THREE.Vector2( 626, 425 ) );
+        californiaPts.push( new THREE.Vector2( 600, 370 ) );
+        californiaPts.push( new THREE.Vector2( 610, 320 ) );
+
+        for ( var i = 0; i < californiaPts.length; i ++ ) {
+            californiaPts[ i ].multiplyScalar( 0.25 );
+        }
+
+        var shape = new THREE.Shape( californiaPts );
+
+        // Setup camera
+        let camera = new THREE.PerspectiveCamera(50, 1, 1, 1000);
+        camera.position.set( 50, 150, 500 );
+        scene.userData.camera = camera;
+
+        // Setup group
+        var group = new THREE.Group();
+        scene.add( group );
+
+        // Setup geometry, material and mesh
+        var geometry = new THREE.ShapeBufferGeometry( shape );
+        let color = new THREE.Color().setHSL(infoIndex / 10, 1, 0.75)
+        var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
+        mesh.position.set( 0,0,0 );
+        mesh.rotation.set( 0,0,0 );
+        mesh.scale.set( 1,1,1 );
+        group.add( mesh );
+
+        // Setup axes helper
+        var axesHelper = new THREE.AxesHelper( 100 );
+        scene.add( axesHelper );
     }
 
     updateSize() {
