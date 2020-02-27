@@ -171,11 +171,8 @@ class Renderer {
     }
 
     renderScene(scene) {
-        // Rotate object
-        scene.children[0].rotation.y = Date.now() * 0.001;
-                
         // Get the position of the scene element relative to the page's viewport
-        var rect = scene.userData.element.getBoundingClientRect();
+        let rect = scene.userData.element.getBoundingClientRect();
 
         // Check if it's offscreen. If so skip it.
         if (rect.bottom < 0 || rect.top > this.renderer.domElement.clientHeight ||
@@ -184,10 +181,10 @@ class Renderer {
         }
 
         // Set the viewport
-        var width = rect.right - rect.left;
-        var height = rect.bottom - rect.top;
-        var left = rect.left;
-        var bottom = this.renderer.domElement.clientHeight - rect.bottom;
+        let width = rect.right - rect.left;
+        let height = rect.bottom - rect.top;
+        let left = rect.left;
+        let bottom = this.renderer.domElement.clientHeight - rect.bottom;
 
         this.renderer.setViewport(left, bottom, width, height);
         this.renderer.setScissor(left, bottom, width, height);
@@ -270,59 +267,57 @@ class Renderer {
     }
 
     setupScene(scene, frameId, infoIndex) {
-        // California shape
-        var californiaPts = [];
+        // Vertices
+        let vertices = [];
+        vertices.push( new THREE.Vector2( 610, 320 ) );
+        vertices.push( new THREE.Vector2( 450, 300 ) );
+        vertices.push( new THREE.Vector2( 392, 392 ) );
+        vertices.push( new THREE.Vector2( 266, 438 ) );
+        vertices.push( new THREE.Vector2( 190, 570 ) );
+        vertices.push( new THREE.Vector2( 190, 600 ) );
+        vertices.push( new THREE.Vector2( 160, 620 ) );
+        vertices.push( new THREE.Vector2( 160, 650 ) );
+        vertices.push( new THREE.Vector2( 180, 640 ) );
+        vertices.push( new THREE.Vector2( 165, 680 ) );
+        vertices.push( new THREE.Vector2( 150, 670 ) );
+        vertices.push( new THREE.Vector2( 90, 737 ) );
+        vertices.push( new THREE.Vector2( 80, 795 ) );
+        vertices.push( new THREE.Vector2( 50, 835 ) );
+        vertices.push( new THREE.Vector2( 64, 870 ) );
+        vertices.push( new THREE.Vector2( 60, 945 ) );
+        vertices.push( new THREE.Vector2( 300, 945 ) );
+        vertices.push( new THREE.Vector2( 300, 743 ) );
+        vertices.push( new THREE.Vector2( 600, 473 ) );
+        vertices.push( new THREE.Vector2( 626, 425 ) );
+        vertices.push( new THREE.Vector2( 600, 370 ) );
+        vertices.push( new THREE.Vector2( 610, 320 ) );
 
-        californiaPts.push( new THREE.Vector2( 610, 320 ) );
-        californiaPts.push( new THREE.Vector2( 450, 300 ) );
-        californiaPts.push( new THREE.Vector2( 392, 392 ) );
-        californiaPts.push( new THREE.Vector2( 266, 438 ) );
-        californiaPts.push( new THREE.Vector2( 190, 570 ) );
-        californiaPts.push( new THREE.Vector2( 190, 600 ) );
-        californiaPts.push( new THREE.Vector2( 160, 620 ) );
-        californiaPts.push( new THREE.Vector2( 160, 650 ) );
-        californiaPts.push( new THREE.Vector2( 180, 640 ) );
-        californiaPts.push( new THREE.Vector2( 165, 680 ) );
-        californiaPts.push( new THREE.Vector2( 150, 670 ) );
-        californiaPts.push( new THREE.Vector2( 90, 737 ) );
-        californiaPts.push( new THREE.Vector2( 80, 795 ) );
-        californiaPts.push( new THREE.Vector2( 50, 835 ) );
-        californiaPts.push( new THREE.Vector2( 64, 870 ) );
-        californiaPts.push( new THREE.Vector2( 60, 945 ) );
-        californiaPts.push( new THREE.Vector2( 300, 945 ) );
-        californiaPts.push( new THREE.Vector2( 300, 743 ) );
-        californiaPts.push( new THREE.Vector2( 600, 473 ) );
-        californiaPts.push( new THREE.Vector2( 626, 425 ) );
-        californiaPts.push( new THREE.Vector2( 600, 370 ) );
-        californiaPts.push( new THREE.Vector2( 610, 320 ) );
-
-        for ( var i = 0; i < californiaPts.length; i ++ ) {
-            californiaPts[ i ].multiplyScalar( 0.25 );
-        }
-
-        var shape = new THREE.Shape( californiaPts );
-
-        // Setup camera
-        let camera = new THREE.PerspectiveCamera(50, 1, 1, 1000);
-        camera.position.set( 50, 150, 500 );
-        scene.userData.camera = camera;
-
-        // Setup group
-        var group = new THREE.Group();
-        scene.add( group );
-
-        // Setup geometry, material and mesh
-        var geometry = new THREE.ShapeBufferGeometry( shape );
+        
+        // Setup shape, geometry, material and mesh
+        let shape = new THREE.Shape( vertices );
+        let geometry = new THREE.ShapeBufferGeometry( shape );
+        geometry.computeBoundingBox();
         let color = new THREE.Color().setHSL(infoIndex / 10, 1, 0.75)
-        var mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
-        mesh.position.set( 0,0,0 );
-        mesh.rotation.set( 0,0,0 );
-        mesh.scale.set( 1,1,1 );
-        group.add( mesh );
+        let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
+        scene.add( mesh );
 
-        // Setup axes helper
-        var axesHelper = new THREE.AxesHelper( 100 );
-        scene.add( axesHelper );
+        // Setup camera to fit geometry
+        let boundingBoxCenter = new THREE.Vector3(); 
+        let boundingBoxSize = new THREE.Vector3();
+        geometry.boundingBox.getCenter(boundingBoxCenter);
+        geometry.boundingBox.getSize(boundingBoxSize);
+
+        let cameraPlaneOffset = 0.1 * Math.max(boundingBoxSize.x, boundingBoxSize.y);
+        let cameraLeft = Math.min(geometry.boundingBox.min.x, boundingBoxCenter.x - boundingBoxSize.y / 2) - cameraPlaneOffset;
+        let cameraRight = Math.max(geometry.boundingBox.max.x, boundingBoxCenter.x + boundingBoxSize.y / 2) + cameraPlaneOffset;
+        let cameraBottom = Math.min(geometry.boundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
+        let cameraTop = Math.max(geometry.boundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
+
+        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, 0, 1);
+        
+        // Save objects inside scene
+        scene.userData.camera = camera;
+        scene.userData.objectMesh = mesh;
     }
 
     updateSize() {
