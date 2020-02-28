@@ -41,7 +41,7 @@ class Translation extends Transformation {
     static getName() { return "Translation" }
 
     setupScene(scene, object) {
-        let boundingBox = null;
+        let sceneBoundingBox = null;
 
         // Loop object states
         for(let i = 0; i < object.states.length; i++) {
@@ -49,22 +49,29 @@ class Translation extends Transformation {
 
             // Setup shape, geometry, material and mesh
             let shape = new THREE.Shape( state.vertices );
-            console.log(shape);
             let geometry = new THREE.ShapeBufferGeometry( shape );
             geometry.computeBoundingBox();
-            boundingBox = geometry.boundingBox; // TODO: INCLUDE ALL THE STATES
             let color = new THREE.Color().setHSL(i / object.states.length, 1, 0.75)
             let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
             scene.add( mesh );
 
+            // Expand bounding box
+            if (sceneBoundingBox === null)
+                sceneBoundingBox = geometry.boundingBox;
+            else sceneBoundingBox.expandByObject(mesh);
+
             // Setup lines
-            let points = shape.getPoints();
-            let geometryPoints = new THREE.BufferGeometry().setFromPoints( points );
-            let line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: 0x000000 } ) );
+            let shapePoints = shape.getPoints();
+            let geometryPoints = new THREE.BufferGeometry().setFromPoints( shapePoints );
+            let line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
             scene.add( line );
+
+            // Setup points
+            let points = new THREE.Points( geometryPoints, new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
+            scene.add( points );
         }
 
-        this.setupSceneCamera(scene, boundingBox);
+        this.setupSceneCamera(scene, sceneBoundingBox);
     }
 }
 
