@@ -42,10 +42,10 @@ class Renderer {
 
     setVisibleFramesInfo(info) {
         this.visibleFramesInfo = info;
-        this.onVisibleFramesInfoSet();
+        this.update();
     }
 
-    onVisibleFramesInfoSet() {
+    update() {
         // When new frame info is set, clear all the content and write new
         this.shouldRender = false;
 
@@ -89,9 +89,7 @@ class Renderer {
 
             // Create the frame elements
             let frameId = info.start;
-            frames.forEach(frame => {
-                let scene = new THREE.Scene();
-        
+            frames.forEach(frame => {        
                 // Create a frame HTML element from the template
                 let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
                 frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.uid);
@@ -100,13 +98,10 @@ class Renderer {
                 rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
         
                 // Save the scene element in the scene object and append the element
-                scene.userData.element = frameElement.getElementsByClassName("scene")[0];
-        
-                // Setup the scene
-                this.setupScene(scene, frameId, infoIndex);
+                frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
 
                 // Add to visible frame
-                visibleFramesInRow.scenes.push(scene);
+                visibleFramesInRow.scenes.push(frame.scene);
                 visibleFramesInRow.frameObjects.push(frame);
                 visibleFramesInRow.frameElements.push(frameElement);
 
@@ -133,8 +128,8 @@ class Renderer {
         // Update canvas size
         this.updateSize();
 
-        // Update elements
-        this.updateElements();
+        // Update if needed
+        this.checkUpdate();
 
         // Update canvas transform with the scroll
         this.canvas.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
@@ -266,60 +261,6 @@ class Renderer {
         this.contextFullscreen.stroke();
     }
 
-    setupScene(scene, frameId, infoIndex) {
-        // Vertices
-        let vertices = [];
-        vertices.push( new THREE.Vector2( 610, 320 ) );
-        vertices.push( new THREE.Vector2( 450, 300 ) );
-        vertices.push( new THREE.Vector2( 392, 392 ) );
-        vertices.push( new THREE.Vector2( 266, 438 ) );
-        vertices.push( new THREE.Vector2( 190, 570 ) );
-        vertices.push( new THREE.Vector2( 190, 600 ) );
-        vertices.push( new THREE.Vector2( 160, 620 ) );
-        vertices.push( new THREE.Vector2( 160, 650 ) );
-        vertices.push( new THREE.Vector2( 180, 640 ) );
-        vertices.push( new THREE.Vector2( 165, 680 ) );
-        vertices.push( new THREE.Vector2( 150, 670 ) );
-        vertices.push( new THREE.Vector2( 90, 737 ) );
-        vertices.push( new THREE.Vector2( 80, 795 ) );
-        vertices.push( new THREE.Vector2( 50, 835 ) );
-        vertices.push( new THREE.Vector2( 64, 870 ) );
-        vertices.push( new THREE.Vector2( 60, 945 ) );
-        vertices.push( new THREE.Vector2( 300, 945 ) );
-        vertices.push( new THREE.Vector2( 300, 743 ) );
-        vertices.push( new THREE.Vector2( 600, 473 ) );
-        vertices.push( new THREE.Vector2( 626, 425 ) );
-        vertices.push( new THREE.Vector2( 600, 370 ) );
-        vertices.push( new THREE.Vector2( 610, 320 ) );
-
-        
-        // Setup shape, geometry, material and mesh
-        let shape = new THREE.Shape( vertices );
-        let geometry = new THREE.ShapeBufferGeometry( shape );
-        geometry.computeBoundingBox();
-        let color = new THREE.Color().setHSL(infoIndex / 10, 1, 0.75)
-        let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
-        scene.add( mesh );
-
-        // Setup camera to fit geometry
-        let boundingBoxCenter = new THREE.Vector3(); 
-        let boundingBoxSize = new THREE.Vector3();
-        geometry.boundingBox.getCenter(boundingBoxCenter);
-        geometry.boundingBox.getSize(boundingBoxSize);
-
-        let cameraPlaneOffset = 0.1 * Math.max(boundingBoxSize.x, boundingBoxSize.y);
-        let cameraLeft = Math.min(geometry.boundingBox.min.x, boundingBoxCenter.x - boundingBoxSize.y / 2) - cameraPlaneOffset;
-        let cameraRight = Math.max(geometry.boundingBox.max.x, boundingBoxCenter.x + boundingBoxSize.y / 2) + cameraPlaneOffset;
-        let cameraBottom = Math.min(geometry.boundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
-        let cameraTop = Math.max(geometry.boundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
-
-        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, 0, 1);
-        
-        // Save objects inside scene
-        scene.userData.camera = camera;
-        scene.userData.objectMesh = mesh;
-    }
-
     updateSize() {
         let width = this.canvas.clientWidth;
         let height = this.canvas.clientHeight;
@@ -336,9 +277,9 @@ class Renderer {
         }
     }
 
-    updateElements() {
+    checkUpdate() {
         if( this.needsUpdate ) {
-            this.onVisibleFramesInfoSet();
+            this.update();
             this.needsUpdate = false;
         }
     }

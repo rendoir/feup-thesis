@@ -4,10 +4,13 @@
  * Every two consecutive vertices form an edge
  */
 class Object {
-    constructor(states) {
-        this.states = states;
+    constructor() {
         this.uid = Object.count;
         Object.count += 1;
+    }
+
+    setStates(states) {
+        this.states = states;
     }
 }
 
