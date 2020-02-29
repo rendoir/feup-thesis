@@ -1,7 +1,7 @@
 const THREE = require('three');
-const { Object, ObjectState } = require('./object');
 
 const ARROW_DEPTH = 1;
+const OBJECT_COLOR = 0xff0000;
 
 /**
  * Abstract class for an object transformation in a frame
@@ -32,7 +32,7 @@ class Transformation {
         let cameraBottom = Math.min(this.sceneBoundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
         let cameraTop = Math.max(this.sceneBoundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
 
-        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -1000000, 1000000);
+        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -100, 100);
         
         // Save objects inside scene
         this.scene.userData.camera = camera;
@@ -47,8 +47,8 @@ class Transformation {
             let shape = new THREE.Shape( state.vertices );
             let geometry = new THREE.ShapeBufferGeometry( shape );
             geometry.computeBoundingBox();
-            let color = new THREE.Color().setHSL(i / this.object.states.length, 1, 0.75)
-            let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, transparent: true, opacity: 1 } ) );
+            let opacity = 0.2 + (i / (this.object.states.length - 1)) * (0.8 - 0.2);
+            let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
             this.object.states[i].boundingBox = new THREE.Box3().copy(geometry.boundingBox);
             this.scene.add( mesh );
 
