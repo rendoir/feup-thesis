@@ -49,6 +49,12 @@ class Renderer {
         // When new frame info is set, clear all the content and write new
         this.shouldRender = false;
 
+        // Clear all tooltips
+        let tooltips = document.getElementsByClassName("tooltip");
+        for (let i = 0; i < tooltips.length; i++) {
+            tooltips[i].parentElement.removeChild(tooltips[i]);
+        }
+
         // Clear content
         this.visibleFrames = [];
         while (this.contentElement.firstChild) {
@@ -92,7 +98,10 @@ class Renderer {
             frames.forEach(frame => {        
                 // Create a frame HTML element from the template
                 let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
-                frameElement.innerHTML = frameElement.innerHTML.replace('$', frame.uid);
+                let descriptionElement = frameElement.getElementsByClassName("description")[0];
+                descriptionElement.innerHTML = frame.transformation.getName();
+                descriptionElement.title = frame.transformation.getDetails();
+                $(descriptionElement).tooltip();
                 this.controller.setFrameDetailEvents(frameElement);
                 frameElement.setAttribute("data-frame-id", frameId);
                 rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);

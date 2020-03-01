@@ -53,7 +53,7 @@ object.setStates([objectState1, objectState2, objectState3]);
 
 
 /* ----- TRANSFORMATIONS ----- */
-let translation = new Translation([70, 150]);
+let translation = new Translation(new THREE.Vector2(70, 150));
 
 
 /* ----- FRAMES ----- */

@@ -10,7 +10,7 @@ const OBJECT_COLOR = 0xff0000;
 class Transformation {
     constructor() { }
 
-    static getName() { throw "Abstract method getName not implemented" }
+    getName() { throw "Abstract method getName not implemented" }
 
     getDetails() { throw "Abstract method getDetails not implemented" }
     
@@ -80,7 +80,11 @@ class Translation extends Transformation {
         this.translationVector = translationVector;
     }
 
-    static getName() { return "Translation" }
+    getName() { return "Translation" }
+
+    getDetails() {
+        return "Translation Vector: (" + this.translationVector.x + ", " + this.translationVector.y + ")";
+    }
 
     setupScene(scene, object) {
         super.setupScene(scene, object);
