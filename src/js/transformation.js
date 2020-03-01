@@ -1,6 +1,7 @@
 const THREE = require('three');
 
 const ARROW_DEPTH = 1;
+const MAPPING_DEPTH = -1;
 const OBJECT_COLOR = 0xff0000;
 
 /**
@@ -48,7 +49,8 @@ class Transformation {
             let geometry = new THREE.ShapeBufferGeometry( shape );
             geometry.computeBoundingBox();
             let opacity = 0.2 + (i / (this.object.states.length - 1)) * (0.8 - 0.2);
-            let mesh = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
+            let mesh = new THREE.Mesh( geometry, 
+                new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
             this.object.states[i].boundingBox = new THREE.Box3().copy(geometry.boundingBox);
             this.scene.add( mesh );
 
@@ -60,11 +62,13 @@ class Transformation {
             // Setup lines
             let shapePoints = shape.getPoints();
             let geometryPoints = new THREE.BufferGeometry().setFromPoints( shapePoints );
-            let line = new THREE.Line( geometryPoints, new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
+            let line = new THREE.Line( geometryPoints, 
+                new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
             this.scene.add( line );
 
             // Setup points
-            let points = new THREE.Points( geometryPoints, new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
+            let points = new THREE.Points( geometryPoints, 
+                new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
             this.scene.add( points );
         }
     }
@@ -81,11 +85,12 @@ class Translation extends Transformation {
     setupScene(scene, object) {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
-        this.setupArrow();
+        this.setupTranslationArrow();
+        this.setupLinearVertexMapping();
         this.setupSceneCamera();
     }
 
-    setupArrow() {
+    setupTranslationArrow() {
         // Draw an arrow from the centroid of the object in the first state to it on the final state
         let origin = new THREE.Vector3();
         let destination = new THREE.Vector3();
@@ -96,12 +101,33 @@ class Translation extends Transformation {
         direction.normalize();
         origin.z = ARROW_DEPTH;
 
-        // let geometryPoints = new THREE.BufferGeometry().setFromPoints( [origin, destination] );
-        // let points = new THREE.Points( geometryPoints, new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
-        // this.scene.add( points );
-
         let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.25 * length, 0.2 * length);
         this.scene.add( arrow );
+    }
+
+    setupLinearVertexMapping() {
+        // Draw dashed lines from each vertex of the initial state to the final state
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+
+        if ( initialState && finalState ) {
+            // Assume same number of vertices and same order
+            for (let i = 0; i < initialState.vertices.length; i++) {
+                const initialVertex = initialState.vertices[i];
+                const finalVertex = finalState.vertices[i];
+
+                let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
+                let line = new THREE.Line( geometryPoints, 
+                    new THREE.LineDashedMaterial( {
+                    color: 0x000000,
+                    dashSize: 1,
+                    gapSize: 1,
+                } ) );
+                line.position.z = MAPPING_DEPTH;
+                line.computeLineDistances();
+                this.scene.add( line );
+            }
+        }
     }
 }
 
