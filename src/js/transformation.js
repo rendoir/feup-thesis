@@ -1,6 +1,6 @@
 const THREE = require('three');
 
-const ARROW_DEPTH = 1;
+const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
 const OBJECT_COLOR = 0xff0000;
 
@@ -33,7 +33,7 @@ class Transformation {
         let cameraBottom = Math.min(this.sceneBoundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
         let cameraTop = Math.max(this.sceneBoundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
 
-        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -100, 100);
+        let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -500, 500);
         
         // Save objects inside scene
         this.scene.userData.camera = camera;
@@ -43,6 +43,10 @@ class Transformation {
         // Loop object states
         for(let i = 0; i < this.object.states.length; i++) {
             let state = this.object.states[i];
+            
+            // Setup group
+            let group = new THREE.Group();
+            group.position.z = i;
 
             // Setup shape, geometry, material and mesh
             let shape = new THREE.Shape( state.vertices );
@@ -52,7 +56,7 @@ class Transformation {
             let mesh = new THREE.Mesh( geometry, 
                 new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
             this.object.states[i].boundingBox = new THREE.Box3().copy(geometry.boundingBox);
-            this.scene.add( mesh );
+            group.add( mesh );
 
             // Expand bounding box
             if (this.sceneBoundingBox === null)
@@ -64,12 +68,14 @@ class Transformation {
             let geometryPoints = new THREE.BufferGeometry().setFromPoints( shapePoints );
             let line = new THREE.Line( geometryPoints, 
                 new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
-            this.scene.add( line );
+            group.add( line );
 
             // Setup points
             let points = new THREE.Points( geometryPoints, 
                 new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
-            this.scene.add( points );
+            group.add( points );
+
+            this.scene.add( group );
         }
     }
 }
