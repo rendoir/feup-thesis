@@ -91,7 +91,7 @@ class Transformation {
                 new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
             group.add( points );
 
-            //this.scene.add( group );
+            this.scene.add( group );
         }
     }
 }
@@ -180,12 +180,16 @@ class Orientation extends Transformation {
     setupRoundArrow() {
         let center = new THREE.Vector3();
         this.sceneBoundingBox.getCenter(center);
+        let topRightCorner = new THREE.Vector3(this.sceneBoundingBox.max.x, this.sceneBoundingBox.max.y, center.z);
+        let radius = topRightCorner.sub(center).length();
+        radius += radius * 0.1;
 
-        let curvedArrow = new CurvedArrow(0, 0, 200, 200, 0, THREE.Math.degToRad(this.orientationAngle), false, 0, 25, 0x000000, 1, 0.1);
+        let curvedArrow = new CurvedArrow(0, 0, radius, radius, 0, THREE.Math.degToRad(this.orientationAngle), false, 0, 100, 0x000000, 1, 0.1);
         curvedArrow.position.x = center.x;
         curvedArrow.position.y = center.y;
         curvedArrow.position.z = ARROW_DEPTH;
 
+        this.sceneBoundingBox.expandByObject(curvedArrow);
         this.scene.add(curvedArrow);
     }
 }
