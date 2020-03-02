@@ -1,7 +1,7 @@
 const THREE = require('three');
 const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
-const { Translation } = require('../transformation');
+const { Translation, Orientation } = require('../transformation');
 
 
 /* ----- OBJECT ----- */
@@ -54,25 +54,26 @@ object.setStates([objectState1, objectState2, objectState3]);
 
 /* ----- TRANSFORMATIONS ----- */
 let translation = new Translation(new THREE.Vector2(70, 150));
+let orientation = new Orientation(120);
 
 
 /* ----- FRAMES ----- */
 let frames = [];
 
 let frame0_0 = new Frame(object, translation); frames.push(frame0_0);
-let frame0_1 = new Frame(object, translation); frames.push(frame0_1);
+let frame0_1 = new Frame(object, orientation); frames.push(frame0_1);
 let frame0_2 = new Frame(object, translation); frames.push(frame0_2);
-let frame0_3 = new Frame(object, translation); frames.push(frame0_3);
+let frame0_3 = new Frame(object, orientation); frames.push(frame0_3);
 let frame0_4 = new Frame(object, translation); frames.push(frame0_4);
 
-let frame1_0 = new Frame(object, translation); frame0_3.childFrames.push(frame1_0);
-let frame1_1 = new Frame(object, translation); frame0_3.childFrames.push(frame1_1);
+let frame1_0 = new Frame(object, orientation); frame0_3.childFrames.push(frame1_0);
+let frame1_1 = new Frame(object, orientation); frame0_3.childFrames.push(frame1_1);
 let frame1_2 = new Frame(object, translation); frame0_3.childFrames.push(frame1_2);
 let frame1_3 = new Frame(object, translation); frame0_3.childFrames.push(frame1_3);
 
 let frame2_0 = new Frame(object, translation); frame1_0.childFrames.push(frame2_0);
 let frame2_1 = new Frame(object, translation); frame1_0.childFrames.push(frame2_1);
-let frame2_2 = new Frame(object, translation); frame1_0.childFrames.push(frame2_2);
+let frame2_2 = new Frame(object, orientation); frame1_0.childFrames.push(frame2_2);
 
 let frame3_0 = new Frame(object, translation); frame2_0.childFrames.push(frame3_0);
 

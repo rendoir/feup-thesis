@@ -1,4 +1,5 @@
 const THREE = require('three');
+const CurvedArrow = require('./helpers/CurvedArrow');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
@@ -90,7 +91,7 @@ class Transformation {
                 new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
             group.add( points );
 
-            this.scene.add( group );
+            //this.scene.add( group );
         }
     }
 }
@@ -140,13 +141,14 @@ class Translation extends Transformation {
             for (let i = 0; i < initialState.vertices.length; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
+                let length = new THREE.Vector2().copy(finalVertex).sub(initialVertex).length();
 
                 let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
                 let line = new THREE.Line( geometryPoints, 
                     new THREE.LineDashedMaterial( {
                     color: 0x000000,
-                    dashSize: 1,
-                    gapSize: 1,
+                    dashSize: 0.006 * length,
+                    gapSize: 0.006 * length,
                 } ) );
                 line.position.z = MAPPING_DEPTH;
                 line.computeLineDistances();
@@ -156,7 +158,40 @@ class Translation extends Transformation {
     }
 }
 
+class Orientation extends Transformation {
+    constructor(orientationAngle) {
+        super();
+        this.orientationAngle = orientationAngle;
+    }
+
+    getName() { return "Orientation" }
+
+    getDetails() {
+        return "Orientation Angle: " + this.orientationAngle + "º";
+    }
+
+    setupScene(scene, object) {
+        super.setupScene(scene, object);
+        this.setupInitialFinalStates();
+        this.setupRoundArrow();
+        this.setupSceneCamera();
+    }
+
+    setupRoundArrow() {
+        let center = new THREE.Vector3();
+        this.sceneBoundingBox.getCenter(center);
+
+        let curvedArrow = new CurvedArrow(0, 0, 200, 200, 0, THREE.Math.degToRad(this.orientationAngle), false, 0, 25, 0x000000, 1, 0.1);
+        curvedArrow.position.x = center.x;
+        curvedArrow.position.y = center.y;
+        curvedArrow.position.z = ARROW_DEPTH;
+
+        this.scene.add(curvedArrow);
+    }
+}
+
 module.exports = {
     Transformation : Transformation,
-    Translation : Translation
+    Translation : Translation,
+    Orientation : Orientation
 }
