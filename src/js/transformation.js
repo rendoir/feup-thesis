@@ -40,10 +40,25 @@ class Transformation {
     }
 
     setupOnionSkinning() {
-        // Loop object states
-        for(let i = 0; i < this.object.states.length; i++) {
-            let state = this.object.states[i];
-            
+        // Setup all the states
+        this._setupObjectStates(this.object.states);
+    }
+
+    setupInitialFinalStates() {
+        // Setup only the first and final states
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+
+        if ( initialState && finalState ) {
+            let states = [initialState, finalState];
+            this._setupObjectStates(states);
+        }
+    }
+
+    _setupObjectStates(states) {
+        for(let i = 0; i < states.length; i++) {
+            let state = states[i];
+
             // Setup group
             let group = new THREE.Group();
             group.position.z = i;
@@ -52,10 +67,10 @@ class Transformation {
             let shape = new THREE.Shape( state.vertices );
             let geometry = new THREE.ShapeBufferGeometry( shape );
             geometry.computeBoundingBox();
-            let opacity = 0.2 + (i / (this.object.states.length - 1)) * (0.8 - 0.2);
+            let opacity = 0.2 + (i / (states.length - 1)) * (0.8 - 0.2);
             let mesh = new THREE.Mesh( geometry, 
                 new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
-            this.object.states[i].boundingBox = new THREE.Box3().copy(geometry.boundingBox);
+            state.boundingBox = new THREE.Box3().copy(geometry.boundingBox);
             group.add( mesh );
 
             // Expand bounding box
