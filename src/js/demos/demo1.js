@@ -63,6 +63,8 @@ let pivot = new THREE.Vector2(338, 622.5);
 
 let verticesOrientation1 = [];
 vertices.forEach(vertex => {
+    //vertex.multiplyScalar(0.2);
+    //vertex.multiplyScalar(10);
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
     newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(20));
     verticesOrientation1.push(newVertex);
@@ -71,6 +73,7 @@ vertices.forEach(vertex => {
 let verticesOrientation2 = [];
 verticesOrientation1.forEach(vertex => {
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
+    //newVertex.add(new THREE.Vector2(100, 200));
     newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(60));
     verticesOrientation2.push(newVertex);
 });

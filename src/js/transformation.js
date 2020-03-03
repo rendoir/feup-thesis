@@ -127,7 +127,11 @@ class Translation extends Transformation {
         direction.normalize();
         origin.z = ARROW_DEPTH;
 
-        let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.25 * length, 0.2 * length);
+        let boxSize = new THREE.Vector3();
+        this.sceneBoundingBox.getSize(boxSize);
+        let dashScale = Math.max(boxSize.x, boxSize.y);
+
+        let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.06 * dashScale, 0.075 * dashScale);
         this.scene.add( arrow );
     }
 
@@ -141,14 +145,17 @@ class Translation extends Transformation {
             for (let i = 0; i < initialState.vertices.length; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
-                let length = new THREE.Vector2().copy(finalVertex).sub(initialVertex).length();
+
+                let boxSize = new THREE.Vector3();
+                this.sceneBoundingBox.getSize(boxSize);
+                let dashScale = Math.max(boxSize.x, boxSize.y);
 
                 let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
                 let line = new THREE.Line( geometryPoints, 
                     new THREE.LineDashedMaterial( {
                     color: 0x000000,
-                    dashSize: 0.006 * length,
-                    gapSize: 0.006 * length,
+                    dashSize: 0.03 * dashScale,
+                    gapSize: 0.03 * dashScale,
                 } ) );
                 line.position.z = MAPPING_DEPTH;
                 line.computeLineDistances();
@@ -174,6 +181,7 @@ class Orientation extends Transformation {
         super.setupScene(scene, object);
         this.setupInitialFinalStates();
         this.setupRoundArrow();
+        this.setupArcVertexMapping();
         this.setupSceneCamera();
     }
 
@@ -191,6 +199,83 @@ class Orientation extends Transformation {
 
         this.sceneBoundingBox.expandByObject(curvedArrow);
         this.scene.add(curvedArrow);
+    }
+
+    setupArcVertexMapping() {
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+
+        if ( initialState && finalState ) {
+            // Consider the center to be the mid point between the center of the two bounding boxes
+            let initialStateCenter = new THREE.Vector3(); 
+            initialState.boundingBox.getCenter(initialStateCenter);
+            let finalStateCenter = new THREE.Vector3(); 
+            finalState.boundingBox.getCenter(finalStateCenter);
+            let c = new THREE.Vector2((initialStateCenter.x + finalStateCenter.x)/2, (initialStateCenter.y + finalStateCenter.y)/2);
+
+            // Loop all vertices
+            for (let i = 0; i < initialState.vertices.length; i++) {                
+                let v1 = initialState.vertices[i];
+                let v2 = finalState.vertices[i];
+                let l1 = v1.distanceTo(c);
+                let l2 = v2.distanceTo(c);
+                
+                // Translate vectors to origin
+                let v1m = new THREE.Vector2(v1.x, v1.y).sub(c);
+                let v2m = new THREE.Vector2(v2.x, v2.y).sub(c);
+
+                // Angle between vectors
+                let theta = Math.acos(v1m.dot(v2m) / (v1m.length() * v2m.length()));
+                let startsAtVertex1 = l1 > l2;
+                if (!startsAtVertex1)
+                    theta *= -1;
+
+                // Rotate vectors to align with axis
+                let alpha = startsAtVertex1 ? v1m.angle() : v2m.angle();
+                let origin = new THREE.Vector2(0,0);
+                v1m.rotateAround(origin, -alpha);
+                v2m.rotateAround(origin, -alpha);
+
+                // Find radiuses
+                let n = (Math.pow(v1m.x,2) - Math.pow(v2m.x,2)) / 
+                    (-1 * Math.pow(v2m.x,2) * Math.pow(v1m.y,2) + Math.pow(v2m.y,2) * Math.pow(v1m.x,2));
+            
+                let m = (1 - Math.pow(v1m.y,2) * n) / Math.pow(v1m.x,2);
+
+                let a = Math.sqrt(1/m);
+                let b = Math.sqrt(1/n);
+
+                // Arc
+                let curve = new THREE.EllipseCurve(
+                    0, 0,
+                    a, b,
+                    0, theta,
+                    !startsAtVertex1,
+                    0
+                );
+                
+                let boxSize = new THREE.Vector3();
+                this.sceneBoundingBox.getSize(boxSize);
+                let dashScale = Math.max(boxSize.x, boxSize.y);
+
+                let points = curve.getPoints( 100 );
+                let geometry = new THREE.BufferGeometry().setFromPoints( points );
+                geometry.computeBoundingBox();
+                let material = new THREE.LineDashedMaterial( {
+                        color: 0x000000,
+                        dashSize: 0.04 * dashScale,
+                        gapSize: 0.04 * dashScale,
+                    } );
+                let ellipse = new THREE.Line( geometry, material );
+                ellipse.rotation.z = alpha;
+                ellipse.position.x = c.x;
+                ellipse.position.y = c.y;
+                ellipse.position.z = MAPPING_DEPTH;
+                ellipse.computeLineDistances();
+                this.scene.add( ellipse );
+                
+            }
+        }
     }
 }
 
