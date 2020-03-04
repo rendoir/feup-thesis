@@ -68,9 +68,9 @@ class Transformation {
             let shape = new THREE.Shape( state.vertices );
             let geometry = new THREE.ShapeBufferGeometry( shape );
             geometry.computeBoundingBox();
-            let opacity = 0.2 + (i / (states.length - 1)) * (0.8 - 0.2);
             let mesh = new THREE.Mesh( geometry, 
-                new THREE.MeshBasicMaterial( { color: OBJECT_COLOR, side: THREE.DoubleSide, transparent: true, opacity: opacity } ) );
+                new THREE.MeshBasicMaterial( { color: this._getColor(i, states.length), side: THREE.DoubleSide, 
+                    transparent: true, opacity: this._getOpacity(i, states.length) } ) );
             state.boundingBox = new THREE.Box3().copy(geometry.boundingBox);
             group.add( mesh );
 
@@ -93,6 +93,15 @@ class Transformation {
 
             this.scene.add( group );
         }
+    }
+
+    _getColor(i, nStates) {
+        return OBJECT_COLOR;  
+    }
+
+    _getOpacity(i, nStates) {
+        // Linear interpolation between min (0.2) and max (0.8)
+        return 0.2 + (i / (nStates - 1)) * (0.8 - 0.2);
     }
 }
 
@@ -279,8 +288,79 @@ class Orientation extends Transformation {
     }
 }
 
+class Scale extends Transformation {
+    constructor(scaleVector) {
+        super();
+        this.scaleVector = scaleVector;
+    }
+
+    getName() { return "Scale" }
+
+    getDetails() {
+        return "Scale Vector: (" + this.scaleVector.x + ", " + this.scaleVector.y + ")";
+    }
+
+    setupScene(scene, object) {
+        super.setupScene(scene, object);
+        this.setupOnionSkinning();
+        this.setupSceneCamera();
+    }
+
+    _getColor(i, nStates) {
+        let h = (120.0 / 360.0) - (i / (nStates - 1)) * (120.0 / 360.0);
+        return new THREE.Color().setHSL(h, 0.8, 0.5);
+    }
+
+    _getOpacity(i, nStates) {
+        return 0.5;
+    }
+
+    _setupObjectStates(states) {
+        for(let i = 0; i < states.length; i++) {
+            let state = states[i];
+
+            // Setup group
+            let group = new THREE.Group();
+
+            // Setup shape, geometry, material and mesh
+            let shape = new THREE.Shape( state.vertices );
+            let geometry = new THREE.ShapeBufferGeometry( shape );
+            geometry.computeBoundingBox();
+            let mesh = new THREE.Mesh( geometry, 
+                new THREE.MeshBasicMaterial( { color: this._getColor(i, states.length), side: THREE.DoubleSide, 
+                    transparent: true, opacity: this._getOpacity(i, states.length) } ) );
+            state.boundingBox = new THREE.Box3().copy(geometry.boundingBox);
+            group.add( mesh );
+
+            // Compare bounding box to first state
+            let firstStateContainsBox = states[0].boundingBox.containsBox(state.boundingBox);
+
+            // Expand bounding box
+            if (this.sceneBoundingBox === null)
+                this.sceneBoundingBox = new THREE.Box3().copy(geometry.boundingBox);
+            else this.sceneBoundingBox.expandByObject(mesh);
+
+            // Setup lines
+            let shapePoints = shape.getPoints();
+            let geometryPoints = new THREE.BufferGeometry().setFromPoints( shapePoints );
+            let line = new THREE.Line( geometryPoints, 
+                new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
+            group.add( line );
+
+            // Setup points
+            let points = new THREE.Points( geometryPoints, 
+                new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
+            group.add( points );
+
+            group.position.z = firstStateContainsBox ? i : -i;
+            this.scene.add( group );
+        }
+    }
+}
+
 module.exports = {
     Transformation : Transformation,
     Translation : Translation,
-    Orientation : Orientation
+    Orientation : Orientation,
+    Scale : Scale
 }
