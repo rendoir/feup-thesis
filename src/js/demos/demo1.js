@@ -1,7 +1,7 @@
 const THREE = require('three');
 const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
-const { Translation, Orientation, Scale, Immutability, Unknown } = require('../transformation');
+const { Translation, Orientation, Scale, Immutability, Unknown, Multiple } = require('../transformation');
 
 
 /* ----- OBJECT ----- */
@@ -156,6 +156,33 @@ objectUnknown.setStates(statesUnknown);
 let unknown = new Unknown();
 
 
+/* ----- MULTIPLE ----- */
+let objectMultiple = new Object();
+
+let verticesMultiple1 = [];
+vertices.forEach(vertex => {
+    let newVertex = new THREE.Vector2(vertex.x, vertex.y);
+    newVertex.rotateAround(centroid, THREE.MathUtils.degToRad(20));
+    verticesMultiple1.push(newVertex);
+});
+
+let verticesMultiple2 = [];
+verticesMultiple1.forEach(vertex => {
+    let newVertex = new THREE.Vector2(vertex.x, vertex.y);
+    newVertex.add(new THREE.Vector2(50, 100));
+    verticesMultiple2.push(newVertex);
+});
+
+let statesMultiple = [
+    new ObjectState(0, vertices),
+    new ObjectState(1, verticesMultiple1),
+    new ObjectState(2, verticesMultiple2)
+];
+objectMultiple.setStates(statesMultiple);
+
+let multiple = new Multiple([new Translation(new THREE.Vector2(50, 100)), new Orientation(20)]);
+
+
 /* ----- FRAMES ----- */
 let frames = [];
 
@@ -164,6 +191,7 @@ let frame0_1 = new Frame(objectOrientation, orientation); frames.push(frame0_1);
 let frame0_2 = new Frame(objectTranslation, translation); frames.push(frame0_2);
 let frame0_3 = new Frame(objectUnknown, unknown); frames.push(frame0_3);
 let frame0_4 = new Frame(objectImmutability, immutability); frames.push(frame0_4);
+let frame0_5 = new Frame(objectMultiple, multiple); frames.push(frame0_5);
 
 let frame1_0 = new Frame(objectOrientation, orientation); frame0_3.childFrames.push(frame1_0);
 let frame1_1 = new Frame(objectScale, scale); frame0_3.childFrames.push(frame1_1);

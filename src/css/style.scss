@@ -69,3 +69,7 @@ canvas {
     margin-left: 1rem;
     margin-right: 1rem;
 }
+
+.tooltip-inner {
+    white-space: pre-line; // Allow line breaks in tooltips
+}

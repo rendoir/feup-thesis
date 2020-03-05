@@ -415,11 +415,35 @@ class Unknown extends Transformation {
     }
 }
 
+class Multiple extends Transformation {
+    constructor(transformations) {
+        super();
+        this.transformations = transformations;
+    }
+
+    getName() { return "Multiple" }
+
+    getDetails() { 
+        let details = "The object suffered multiple transformations:\n";
+        this.transformations.forEach(transformation => {
+            details += transformation.getDetails() + '\n';
+        });
+        return details;
+    }
+
+    setupScene(scene, object) { 
+        super.setupScene(scene, object);
+        this.setupOnionSkinning();
+        this.setupSceneCamera();
+    }
+}
+
 module.exports = {
     Transformation : Transformation,
     Translation : Translation,
     Orientation : Orientation,
     Scale : Scale,
     Immutability : Immutability,
-    Unknown : Unknown
+    Unknown : Unknown,
+    Multiple : Multiple
 }
