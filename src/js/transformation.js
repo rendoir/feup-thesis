@@ -377,9 +377,49 @@ class Scale extends Transformation {
     }
 }
 
+class Immutability extends Transformation {
+    getName() { return "Immutability" }
+
+    getDetails() { return "The object had no substantial transformations" }
+    
+    setupScene(scene, object) { 
+        super.setupScene(scene, object);
+        this.setupInitialState();
+        this.setupSceneCamera();
+    }
+
+    setupInitialState() {
+        // Setup only the first state
+        let initialState = this.object.states[0];
+
+        if ( initialState ) {
+            let states = [initialState];
+            this._setupObjectStates(states);
+        }
+    }
+
+    _getOpacity(i, nStates) {
+        return 0.8;
+    }
+}
+
+class Unknown extends Transformation {
+    getName() { return "Unknown" }
+
+    getDetails() { return "The object suffered an unknown transformation" }
+    
+    setupScene(scene, object) { 
+        super.setupScene(scene, object);
+        this.setupOnionSkinning();
+        this.setupSceneCamera();
+    }
+}
+
 module.exports = {
     Transformation : Transformation,
     Translation : Translation,
     Orientation : Orientation,
-    Scale : Scale
+    Scale : Scale,
+    Immutability : Immutability,
+    Unknown : Unknown
 }

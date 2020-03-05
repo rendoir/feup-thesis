@@ -1,7 +1,7 @@
 const THREE = require('three');
 const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
-const { Translation, Orientation, Scale } = require('../transformation');
+const { Translation, Orientation, Scale, Immutability, Unknown } = require('../transformation');
 
 
 /* ----- OBJECT ----- */
@@ -120,14 +120,50 @@ objectScale.setStates(statesScale);
 let scale = new Scale(new THREE.Vector2(0.75*4, 2*0.5));
 
 
+/* ----- IMMUTABILITY ----- */
+let objectImmutability = new Object();
+objectImmutability.setStates([new ObjectState(0, vertices)]);
+
+let immutability = new Immutability();
+
+
+/* ----- UNKNOWN ----- */
+let objectUnknown = new Object();
+
+let verticesUnknown1 = [];
+let shear1 = new THREE.Matrix4().makeShear(1,1,0);
+vertices.forEach(vertex => {
+    let newVertex = new THREE.Vector2(vertex.x, vertex.y);
+    newVertex.applyMatrix3(shear1);
+    verticesUnknown1.push(newVertex);
+});
+
+let verticesUnknown2 = [];
+let shear2 = new THREE.Matrix4().makeShear(1,1,0);
+verticesUnknown1.forEach(vertex => {
+    let newVertex = new THREE.Vector2(vertex.x, vertex.y);
+    newVertex.applyMatrix3(shear2);
+    verticesUnknown2.push(newVertex);
+});
+
+let statesUnknown = [
+    new ObjectState(0, vertices),
+    new ObjectState(1, verticesUnknown1),
+    new ObjectState(2, verticesUnknown2)
+];
+objectUnknown.setStates(statesUnknown);
+
+let unknown = new Unknown();
+
+
 /* ----- FRAMES ----- */
 let frames = [];
 
 let frame0_0 = new Frame(objectScale, scale); frames.push(frame0_0);
 let frame0_1 = new Frame(objectOrientation, orientation); frames.push(frame0_1);
 let frame0_2 = new Frame(objectTranslation, translation); frames.push(frame0_2);
-let frame0_3 = new Frame(objectOrientation, orientation); frames.push(frame0_3);
-let frame0_4 = new Frame(objectTranslation, translation); frames.push(frame0_4);
+let frame0_3 = new Frame(objectUnknown, unknown); frames.push(frame0_3);
+let frame0_4 = new Frame(objectImmutability, immutability); frames.push(frame0_4);
 
 let frame1_0 = new Frame(objectOrientation, orientation); frame0_3.childFrames.push(frame1_0);
 let frame1_1 = new Frame(objectScale, scale); frame0_3.childFrames.push(frame1_1);
