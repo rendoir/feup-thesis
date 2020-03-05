@@ -95,6 +95,51 @@ class Transformation {
         }
     }
 
+    setupLinearVertexMapping() {
+        // Draw dashed lines from each vertex of the initial state to the final state
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+
+        if ( initialState && finalState ) {
+            // Assume same number of vertices and same order
+            for (let i = 0; i < initialState.vertices.length; i++) {
+                const initialVertex = initialState.vertices[i];
+                const finalVertex = finalState.vertices[i];
+
+                let boxSize = new THREE.Vector3();
+                this.sceneBoundingBox.getSize(boxSize);
+                let dashScale = Math.max(boxSize.x, boxSize.y);
+
+                let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
+                let line = new THREE.Line( geometryPoints, 
+                    new THREE.LineDashedMaterial( {
+                    color: 0x000000,
+                    dashSize: 0.03 * dashScale,
+                    gapSize: 0.03 * dashScale,
+                } ) );
+                line.position.z = MAPPING_DEPTH;
+                line.computeLineDistances();
+                this.scene.add( line );
+
+                // Triangle
+                if ( this.drawArrowsInVertexMapping ) {
+                    let triangleGeometry = new THREE.Geometry();
+                    triangleGeometry.vertices.push(new THREE.Vector3(0,0,0));
+                    triangleGeometry.vertices.push(new THREE.Vector3(-0.5,-1,0));
+                    triangleGeometry.vertices.push(new THREE.Vector3(0.5,-1,0));
+                    triangleGeometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
+                    let triangleMesh = new THREE.Mesh( triangleGeometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
+                    
+                    triangleMesh.scale.set(dashScale / 30, dashScale / 30, 1);
+                    let direction = finalVertex.clone().sub(initialVertex);
+                    triangleMesh.rotation.set(0,0, - (Math.PI / 2 - direction.angle()));
+                    triangleMesh.position.set(finalVertex.x, finalVertex.y, MAPPING_DEPTH);
+                    this.scene.add(triangleMesh);
+                }
+            }
+        }
+    }
+
     _getColor(i, nStates) {
         return OBJECT_COLOR;  
     }
@@ -142,35 +187,6 @@ class Translation extends Transformation {
 
         let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.06 * dashScale, 0.075 * dashScale);
         this.scene.add( arrow );
-    }
-
-    setupLinearVertexMapping() {
-        // Draw dashed lines from each vertex of the initial state to the final state
-        let initialState = this.object.states[0];
-        let finalState = this.object.states[this.object.states.length-1];
-
-        if ( initialState && finalState ) {
-            // Assume same number of vertices and same order
-            for (let i = 0; i < initialState.vertices.length; i++) {
-                const initialVertex = initialState.vertices[i];
-                const finalVertex = finalState.vertices[i];
-
-                let boxSize = new THREE.Vector3();
-                this.sceneBoundingBox.getSize(boxSize);
-                let dashScale = Math.max(boxSize.x, boxSize.y);
-
-                let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
-                let line = new THREE.Line( geometryPoints, 
-                    new THREE.LineDashedMaterial( {
-                    color: 0x000000,
-                    dashSize: 0.03 * dashScale,
-                    gapSize: 0.03 * dashScale,
-                } ) );
-                line.position.z = MAPPING_DEPTH;
-                line.computeLineDistances();
-                this.scene.add( line );
-            }
-        }
     }
 }
 
@@ -302,7 +318,9 @@ class Scale extends Transformation {
 
     setupScene(scene, object) {
         super.setupScene(scene, object);
+        this.drawArrowsInVertexMapping = true;
         this.setupOnionSkinning();
+        this.setupLinearVertexMapping();
         this.setupSceneCamera();
     }
 
