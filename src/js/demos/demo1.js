@@ -95,7 +95,7 @@ let verticesScale1 = [];
 vertices.forEach(vertex => {
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
     newVertex.sub(centroid);
-    newVertex.multiply(new THREE.Vector2(1.1, 1.1));
+    newVertex.multiply(new THREE.Vector2(0.4, 0.7));
     newVertex.add(centroid);
     verticesScale1.push(newVertex);
 });
@@ -105,7 +105,7 @@ verticesScale1.forEach(vertex => {
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
     //newVertex.add(new THREE.Vector2(100, 200));
     newVertex.sub(centroid);
-    newVertex.multiply(new THREE.Vector2(1.1, 1.1));
+    newVertex.multiply(new THREE.Vector2(4, 3.5));
     newVertex.add(centroid);
     verticesScale2.push(newVertex);
 });

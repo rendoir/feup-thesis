@@ -312,7 +312,7 @@ class Scale extends Transformation {
     }
 
     _getOpacity(i, nStates) {
-        return 0.5;
+        return 0.6;
     }
 
     _setupObjectStates(states) {
@@ -353,6 +353,7 @@ class Scale extends Transformation {
             group.add( points );
 
             group.position.z = firstStateContainsBox ? i : -i;
+            group.renderOrder = firstStateContainsBox ? -i : i;
             this.scene.add( group );
         }
     }
