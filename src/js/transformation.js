@@ -304,6 +304,36 @@ class Orientation extends Transformation {
     }
 }
 
+class Rotation extends Transformation {
+    constructor(pivot, rotationAngle) {
+        super();
+        this.pivot = pivot;
+        this.rotationAngle = rotationAngle;
+    }
+
+    getName() { return "Rotation" }
+
+    getDetails() {
+        return "Rotation Pivot: (" + this.pivot.x + ", " + this.pivot.y + ")\nRotation Angle: " + this.rotationAngle + "º";
+    }
+
+    setupScene(scene, object) {
+        super.setupScene(scene, object);
+        this.setupOnionSkinning();
+        this.setupPivotArrow();
+        this.setupSceneCamera();
+    }
+
+    setupPivotArrow() {
+        // Draw pivot
+        let dotGeometry = new THREE.Geometry().setFromPoints([this.pivot]);
+        let dotMaterial = new THREE.PointsMaterial( { size: 5, color: 0x000000 } );
+        let dot = new THREE.Points( dotGeometry, dotMaterial );
+        this.scene.add( dot );
+        this.sceneBoundingBox.expandByPoint(this.pivot);
+    }
+}
+
 class Scale extends Transformation {
     constructor(scaleVector) {
         super();
@@ -442,6 +472,7 @@ module.exports = {
     Transformation : Transformation,
     Translation : Translation,
     Orientation : Orientation,
+    Rotation : Rotation,
     Scale : Scale,
     Immutability : Immutability,
     Unknown : Unknown,
