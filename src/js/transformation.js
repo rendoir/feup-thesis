@@ -1,5 +1,6 @@
 const THREE = require('three');
 const CurvedArrow = require('./helpers/CurvedArrow');
+const EllipseArc = require('./helpers/EllipseArc');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
@@ -91,6 +92,13 @@ class Transformation {
                 new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
             group.add( points );
 
+            if ( this.isochronMap ) {
+                // Compare bounding box to first state
+                let firstStateContainsBox = states[0].boundingBox.containsBox(state.boundingBox);
+                group.position.z = firstStateContainsBox ? i : -i;
+                group.renderOrder = firstStateContainsBox ? -i : i;
+            }
+
             this.scene.add( group );
         }
     }
@@ -101,21 +109,20 @@ class Transformation {
         let finalState = this.object.states[this.object.states.length-1];
 
         if ( initialState && finalState ) {
+            let sceneScale = this.getMaxSceneBoxSize();
+
             // Assume same number of vertices and same order
             for (let i = 0; i < initialState.vertices.length; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
 
-                let boxSize = new THREE.Vector3();
-                this.sceneBoundingBox.getSize(boxSize);
-                let dashScale = Math.max(boxSize.x, boxSize.y);
-
+                // Line
                 let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
                 let line = new THREE.Line( geometryPoints, 
                     new THREE.LineDashedMaterial( {
                     color: 0x000000,
-                    dashSize: 0.03 * dashScale,
-                    gapSize: 0.03 * dashScale,
+                    dashSize: 0.03 * sceneScale,
+                    gapSize: 0.03 * sceneScale,
                 } ) );
                 line.position.z = MAPPING_DEPTH;
                 line.computeLineDistances();
@@ -130,7 +137,7 @@ class Transformation {
                     triangleGeometry.faces.push( new THREE.Face3( 0, 1, 2 ) );
                     let triangleMesh = new THREE.Mesh( triangleGeometry, new THREE.MeshBasicMaterial( { color: 0x000000 } ) );
                     
-                    triangleMesh.scale.set(dashScale / 30, dashScale / 30, 1);
+                    triangleMesh.scale.set(sceneScale / 30, sceneScale / 30, 1);
                     let direction = finalVertex.clone().sub(initialVertex);
                     triangleMesh.rotation.set(0,0, - (Math.PI / 2 - direction.angle()));
                     triangleMesh.position.set(finalVertex.x, finalVertex.y, MAPPING_DEPTH);
@@ -147,6 +154,12 @@ class Transformation {
     _getOpacity(i, nStates) {
         // Linear interpolation between min (0.2) and max (0.8)
         return 0.2 + (i / (nStates - 1)) * (0.8 - 0.2);
+    }
+
+    getMaxSceneBoxSize() {
+        let boxSize = new THREE.Vector3();
+        this.sceneBoundingBox.getSize(boxSize);
+        return Math.max(boxSize.x, boxSize.y);
     }
 }
 
@@ -181,11 +194,9 @@ class Translation extends Transformation {
         direction.normalize();
         origin.z = ARROW_DEPTH;
 
-        let boxSize = new THREE.Vector3();
-        this.sceneBoundingBox.getSize(boxSize);
-        let dashScale = Math.max(boxSize.x, boxSize.y);
+        let sceneScale = this.getMaxSceneBoxSize();
 
-        let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.06 * dashScale, 0.075 * dashScale);
+        let arrow = new THREE.ArrowHelper( direction, origin, length, 0x000000, 0.06 * sceneScale, 0.075 * sceneScale);
         this.scene.add( arrow );
     }
 }
@@ -236,69 +247,15 @@ class Orientation extends Transformation {
             initialState.boundingBox.getCenter(initialStateCenter);
             let finalStateCenter = new THREE.Vector3(); 
             finalState.boundingBox.getCenter(finalStateCenter);
-            let c = new THREE.Vector2((initialStateCenter.x + finalStateCenter.x)/2, (initialStateCenter.y + finalStateCenter.y)/2);
+            let center = new THREE.Vector2((initialStateCenter.x + finalStateCenter.x)/2, (initialStateCenter.y + finalStateCenter.y)/2);
+
+            // Get bounding box size
+            let sceneScale = this.getMaxSceneBoxSize();
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
-                let v1 = initialState.vertices[i];
-                let v2 = finalState.vertices[i];
-                let l1 = v1.distanceTo(c);
-                let l2 = v2.distanceTo(c);
-                
-                // Translate vectors to origin
-                let v1m = new THREE.Vector2(v1.x, v1.y).sub(c);
-                let v2m = new THREE.Vector2(v2.x, v2.y).sub(c);
-
-                // Angle between vectors
-                let theta = Math.acos(v1m.dot(v2m) / (v1m.length() * v2m.length()));
-                let startsAtVertex1 = l1 > l2;
-                if (!startsAtVertex1)
-                    theta *= -1;
-
-                // Rotate vectors to align with axis
-                let alpha = startsAtVertex1 ? v1m.angle() : v2m.angle();
-                let origin = new THREE.Vector2(0,0);
-                v1m.rotateAround(origin, -alpha);
-                v2m.rotateAround(origin, -alpha);
-
-                // Find radiuses
-                let n = (Math.pow(v1m.x,2) - Math.pow(v2m.x,2)) / 
-                    (-1 * Math.pow(v2m.x,2) * Math.pow(v1m.y,2) + Math.pow(v2m.y,2) * Math.pow(v1m.x,2));
-            
-                let m = (1 - Math.pow(v1m.y,2) * n) / Math.pow(v1m.x,2);
-
-                let a = Math.sqrt(1/m);
-                let b = Math.sqrt(1/n);
-
-                // Arc
-                let curve = new THREE.EllipseCurve(
-                    0, 0,
-                    a, b,
-                    0, theta,
-                    !startsAtVertex1,
-                    0
-                );
-                
-                let boxSize = new THREE.Vector3();
-                this.sceneBoundingBox.getSize(boxSize);
-                let dashScale = Math.max(boxSize.x, boxSize.y);
-
-                let points = curve.getPoints( 100 );
-                let geometry = new THREE.BufferGeometry().setFromPoints( points );
-                geometry.computeBoundingBox();
-                let material = new THREE.LineDashedMaterial( {
-                        color: 0x000000,
-                        dashSize: 0.04 * dashScale,
-                        gapSize: 0.04 * dashScale,
-                    } );
-                let ellipse = new THREE.Line( geometry, material );
-                ellipse.rotation.z = alpha;
-                ellipse.position.x = c.x;
-                ellipse.position.y = c.y;
-                ellipse.position.z = MAPPING_DEPTH;
-                ellipse.computeLineDistances();
-                this.scene.add( ellipse );
-                
+                let ellipseArc = new EllipseArc(center, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH);
+                this.scene.add( ellipseArc );
             }
         }
     }
@@ -338,6 +295,8 @@ class Scale extends Transformation {
     constructor(scaleVector) {
         super();
         this.scaleVector = scaleVector;
+        this.drawArrowsInVertexMapping = true;
+        this.isochronMap = true;
     }
 
     getName() { return "Scale" }
@@ -348,7 +307,6 @@ class Scale extends Transformation {
 
     setupScene(scene, object) {
         super.setupScene(scene, object);
-        this.drawArrowsInVertexMapping = true;
         this.setupOnionSkinning();
         this.setupLinearVertexMapping();
         this.setupSceneCamera();
@@ -361,49 +319,6 @@ class Scale extends Transformation {
 
     _getOpacity(i, nStates) {
         return 0.6;
-    }
-
-    _setupObjectStates(states) {
-        for(let i = 0; i < states.length; i++) {
-            let state = states[i];
-
-            // Setup group
-            let group = new THREE.Group();
-
-            // Setup shape, geometry, material and mesh
-            let shape = new THREE.Shape( state.vertices );
-            let geometry = new THREE.ShapeBufferGeometry( shape );
-            geometry.computeBoundingBox();
-            let mesh = new THREE.Mesh( geometry, 
-                new THREE.MeshBasicMaterial( { color: this._getColor(i, states.length), side: THREE.DoubleSide, 
-                    transparent: true, opacity: this._getOpacity(i, states.length) } ) );
-            state.boundingBox = new THREE.Box3().copy(geometry.boundingBox);
-            group.add( mesh );
-
-            // Compare bounding box to first state
-            let firstStateContainsBox = states[0].boundingBox.containsBox(state.boundingBox);
-
-            // Expand bounding box
-            if (this.sceneBoundingBox === null)
-                this.sceneBoundingBox = new THREE.Box3().copy(geometry.boundingBox);
-            else this.sceneBoundingBox.expandByObject(mesh);
-
-            // Setup lines
-            let shapePoints = shape.getPoints();
-            let geometryPoints = new THREE.BufferGeometry().setFromPoints( shapePoints );
-            let line = new THREE.Line( geometryPoints, 
-                new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
-            group.add( line );
-
-            // Setup points
-            let points = new THREE.Points( geometryPoints, 
-                new THREE.PointsMaterial( { color: 0x000000, size: 2, transparent: true, opacity: 1 } ) );
-            group.add( points );
-
-            group.position.z = firstStateContainsBox ? i : -i;
-            group.renderOrder = firstStateContainsBox ? -i : i;
-            this.scene.add( group );
-        }
     }
 }
 
