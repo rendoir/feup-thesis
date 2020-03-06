@@ -278,6 +278,7 @@ class Rotation extends Transformation {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
         this.setupPivotArrow();
+        this.setupArcVertexMapping();
         this.setupSceneCamera();
     }
 
@@ -288,6 +289,22 @@ class Rotation extends Transformation {
         let dot = new THREE.Points( dotGeometry, dotMaterial );
         this.scene.add( dot );
         this.sceneBoundingBox.expandByPoint(this.pivot);
+    }
+
+    setupArcVertexMapping() {
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+
+        if ( initialState && finalState ) {
+            // Get bounding box size
+            let sceneScale = this.getMaxSceneBoxSize();
+
+            // Loop all vertices
+            for (let i = 0; i < initialState.vertices.length; i++) {                
+                let ellipseArc = new EllipseArc(this.pivot, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH);
+                this.scene.add( ellipseArc );
+            }
+        }
     }
 }
 
