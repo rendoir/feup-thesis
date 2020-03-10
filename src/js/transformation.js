@@ -283,12 +283,35 @@ class Rotation extends Transformation {
     }
 
     setupPivotArrow() {
+        let group = new THREE.Group();
+        group.position.z = ARROW_DEPTH;
+
         // Draw pivot
         let dotGeometry = new THREE.Geometry().setFromPoints([this.pivot]);
         let dotMaterial = new THREE.PointsMaterial( { size: 5, color: 0x000000 } );
         let dot = new THREE.Points( dotGeometry, dotMaterial );
-        this.scene.add( dot );
+        group.add( dot );
         this.sceneBoundingBox.expandByPoint(this.pivot);
+
+        let initialState = this.object.states[0];
+        let finalState = this.object.states[this.object.states.length-1];
+        if (initialState && finalState ) {
+            // Draw lines from pivot to state centroid
+            let pivotLineInitial = this._setupPivotLine(initialState, group);
+            let pivotLineFinal = this._setupPivotLine(finalState, group);
+            let minimumDistance = Math.min(pivotLineInitial.halfwayDistance, pivotLineFinal.halfwayDistance);
+            
+            // Draw curved arrow from one line to the other
+            let angleInitial = pivotLineInitial.lineVector.angle();
+            let angleFinal = pivotLineFinal.lineVector.angle();
+            let curvedArrow = new CurvedArrow(0, 0, minimumDistance, minimumDistance, 
+                angleInitial, angleFinal, false, 0, 100, 0x000000, 1, 0.4);
+            curvedArrow.position.x = this.pivot.x;
+            curvedArrow.position.y = this.pivot.y;
+            group.add(curvedArrow);
+        }
+
+        this.scene.add( group );
     }
 
     setupArcVertexMapping() {
@@ -305,6 +328,26 @@ class Rotation extends Transformation {
                 this.scene.add( ellipseArc );
             }
         }
+    }
+
+    _setupPivotLine(state, group) {
+        const percentageOfLine = 0.4; // Draw only a percentage of the line
+
+        let center = new THREE.Vector3(); 
+        state.boundingBox.getCenter(center);
+
+        let lineVector = new THREE.Vector2(center.x, center.y).sub(this.pivot);
+        let halfwayDistance = lineVector.clone().multiplyScalar(percentageOfLine/2).length();
+        let lineEnd = lineVector.clone().multiplyScalar(percentageOfLine).add(this.pivot);
+        let geometryPoints = new THREE.BufferGeometry().setFromPoints( [this.pivot, lineEnd] );
+        let line = new THREE.Line( geometryPoints, 
+            new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 1 } ) );
+        group.add( line );
+
+        return { 
+            halfwayDistance: halfwayDistance,
+            lineVector: lineVector 
+        };
     }
 }
 

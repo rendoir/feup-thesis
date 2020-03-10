@@ -63,8 +63,9 @@ let centroid = new THREE.Vector2(338, 622.5);
 
 let verticesOrientation1 = [];
 vertices.forEach(vertex => {
-    //vertex.multiplyScalar(0.2);
+    //vertex.sub(centroid);
     //vertex.multiplyScalar(10);
+    //vertex.add(centroid);
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
     newVertex.rotateAround(centroid, THREE.MathUtils.degToRad(20));
     verticesOrientation1.push(newVertex);
@@ -97,7 +98,7 @@ vertices.forEach(vertex => {
     //vertex.multiplyScalar(0.2);
     //vertex.multiplyScalar(10);
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
-    newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(5));
+    newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(20));
     verticesRotation1.push(newVertex);
 });
 
@@ -105,7 +106,7 @@ let verticesRotation2 = [];
 verticesRotation1.forEach(vertex => {
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
     //newVertex.add(new THREE.Vector2(100, 200));
-    newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(15));
+    newVertex.rotateAround(pivot, THREE.MathUtils.degToRad(30));
     verticesRotation2.push(newVertex);
 });
 
@@ -116,7 +117,7 @@ let statesRotation = [
 ];
 objectRotation.setStates(statesRotation);
 
-let rotation = new Rotation(pivot, 20);
+let rotation = new Rotation(pivot, 50);
 
 
 /* ----- SCALE ----- */
