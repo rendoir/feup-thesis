@@ -228,7 +228,10 @@ class Orientation extends Transformation {
         let radius = topRightCorner.sub(center).length();
         radius += radius * 0.1;
 
-        let curvedArrow = new CurvedArrow(0, 0, radius, radius, 0, THREE.Math.degToRad(this.orientationAngle), false, 0, 100, 0x000000, 1, 0.1);
+        let angle = THREE.Math.degToRad(this.orientationAngle);
+        let clockwise = this.orientationAngle < 0;
+        let curvedArrow = new CurvedArrow(0, 0, radius, radius, 0, angle, 
+            clockwise, 0, 100, 0x000000, 1, 0.1);
         curvedArrow.position.x = center.x;
         curvedArrow.position.y = center.y;
         curvedArrow.position.z = ARROW_DEPTH;
@@ -304,8 +307,9 @@ class Rotation extends Transformation {
             // Draw curved arrow from one line to the other
             let angleInitial = pivotLineInitial.lineVector.angle();
             let angleFinal = pivotLineFinal.lineVector.angle();
+            let clockwise = angleFinal < angleInitial;
             let curvedArrow = new CurvedArrow(0, 0, minimumDistance, minimumDistance, 
-                angleInitial, angleFinal, false, 0, 100, 0x000000, 1, 0.4);
+                angleInitial, angleFinal, clockwise, 0, 100, 0x000000, 1, 0.4);
             curvedArrow.position.x = this.pivot.x;
             curvedArrow.position.y = this.pivot.y;
             group.add(curvedArrow);

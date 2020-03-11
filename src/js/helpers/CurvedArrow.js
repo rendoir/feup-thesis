@@ -28,7 +28,8 @@ class CurvedArrow extends THREE.Object3D {
         this.cone.scale.set( _headWidth, _headLength, _headWidth );
 
         let lastPoint = points[points.length-1];
-        this.cone.rotation.set(0, 0, endAngle);
+        let coneRotation = clockwise ? Math.PI + endAngle : endAngle;
+        this.cone.rotation.set(0, 0, coneRotation);
         this.cone.position.set(lastPoint.x, lastPoint.y, 0);
         this.cone.updateMatrix();
         this.add( this.cone );
