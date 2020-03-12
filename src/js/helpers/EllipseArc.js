@@ -4,6 +4,10 @@ class EllipseArc extends THREE.Object3D {
     constructor(center, vertex1, vertex2, maxBoxSize, depth, angle) {
         super();
 
+        // Can't draw for angles bigger than PI
+        if( angle > Math.PI )
+            return;
+
         let clockwise = angle < 0;
 
         // Get distances to center

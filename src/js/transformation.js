@@ -210,7 +210,7 @@ class Orientation extends Transformation {
     getName() { return "Orientation" }
 
     getDetails() {
-        return "Orientation Angle: " + this.orientationAngle + "º";
+        return "Orientation Angle: " + THREE.MathUtils.radToDeg(this.orientationAngle).toPrecision(4) + "º";
     }
 
     setupScene(scene, object) {
@@ -228,9 +228,8 @@ class Orientation extends Transformation {
         let radius = topRightCorner.sub(center).length();
         radius += radius * 0.1;
 
-        let angle = THREE.Math.degToRad(this.orientationAngle);
         let clockwise = this.orientationAngle < 0;
-        let curvedArrow = new CurvedArrow(0, 0, radius, radius, 0, angle, 
+        let curvedArrow = new CurvedArrow(0, 0, radius, radius, 0, this.orientationAngle, 
             clockwise, 0, 100, 0x000000, 1, 0.1);
         curvedArrow.position.x = center.x;
         curvedArrow.position.y = center.y;
@@ -274,7 +273,7 @@ class Rotation extends Transformation {
     getName() { return "Rotation" }
 
     getDetails() {
-        return "Rotation Pivot: (" + this.pivot.x + ", " + this.pivot.y + ")\nRotation Angle: " + this.rotationAngle + "º";
+        return "Rotation Pivot: (" + this.pivot.x + ", " + this.pivot.y + ")\nRotation Angle: " + THREE.MathUtils.radToDeg(this.rotationAngle).toPrecision(4) + "º";
     }
 
     setupScene(scene, object) {

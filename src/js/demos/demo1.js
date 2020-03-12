@@ -86,7 +86,7 @@ let statesOrientation = [
 ];
 objectOrientation.setStates(statesOrientation);
 
-let orientation = new Orientation(80);
+let orientation = new Orientation(THREE.MathUtils.degToRad(80));
 
 
 /* ----- Rotation ----- */
@@ -117,7 +117,7 @@ let statesRotation = [
 ];
 objectRotation.setStates(statesRotation);
 
-let rotation = new Rotation(pivot, 50);
+let rotation = new Rotation(pivot, THREE.MathUtils.degToRad(50));
 
 
 /* ----- SCALE ----- */
