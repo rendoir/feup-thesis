@@ -1,8 +1,10 @@
 const THREE = require("three");
 
 class EllipseArc extends THREE.Object3D {
-    constructor(center, vertex1, vertex2, maxBoxSize, depth) {
+    constructor(center, vertex1, vertex2, maxBoxSize, depth, angle) {
         super();
+
+        let clockwise = angle < 0;
 
         // Get distances to center
         let centerDistanceVertex1 = vertex1.distanceTo(center);
@@ -14,12 +16,14 @@ class EllipseArc extends THREE.Object3D {
 
         // Angle between vectors
         let theta = Math.acos(modifiedVertex1.dot(modifiedVertex2) / (modifiedVertex1.length() * modifiedVertex2.length()));
-        let startsAtVertex1 = centerDistanceVertex1 > centerDistanceVertex2;
-        if (!startsAtVertex1)
+        let isVertex1Larger = centerDistanceVertex1 > centerDistanceVertex2;
+        if ((isVertex1Larger && clockwise) || (!isVertex1Larger && !clockwise))
             theta *= -1;
+        let startAngle = isVertex1Larger ? 0 : theta;
+        let endAngle = isVertex1Larger ? theta : 0;
 
         // Rotate vectors to align with axis
-        let alpha = startsAtVertex1 ? modifiedVertex1.angle() : modifiedVertex2.angle();
+        let alpha = isVertex1Larger ? modifiedVertex1.angle() : modifiedVertex2.angle();
         let origin = new THREE.Vector2(0,0);
         modifiedVertex1.rotateAround(origin, -alpha);
         modifiedVertex2.rotateAround(origin, -alpha);
@@ -37,8 +41,8 @@ class EllipseArc extends THREE.Object3D {
         let curve = new THREE.EllipseCurve(
             0, 0,
             radiusX, radiusY,
-            0, theta,
-            !startsAtVertex1,
+            startAngle, endAngle,
+            clockwise,
             0
         );
 

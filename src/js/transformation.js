@@ -257,7 +257,7 @@ class Orientation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
-                let ellipseArc = new EllipseArc(center, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH);
+                let ellipseArc = new EllipseArc(center, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH, this.orientationAngle);
                 this.scene.add( ellipseArc );
             }
         }
@@ -328,7 +328,7 @@ class Rotation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
-                let ellipseArc = new EllipseArc(this.pivot, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH);
+                let ellipseArc = new EllipseArc(this.pivot, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH, this.rotationAngle);
                 this.scene.add( ellipseArc );
             }
         }
