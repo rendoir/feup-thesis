@@ -212,7 +212,7 @@ let statesMultiple = [
 ];
 objectMultiple.setStates(statesMultiple);
 
-let multiple = new Multiple([new Translation(new THREE.Vector2(50, 100)), new Orientation(20)]);
+let multiple = new Multiple([new Translation(new THREE.Vector2(50, 100)), new Orientation(THREE.MathUtils.degToRad(20))]);
 
 
 /* ----- FRAMES ----- */

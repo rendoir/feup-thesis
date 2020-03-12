@@ -172,7 +172,7 @@ class Translation extends Transformation {
     getName() { return "Translation" }
 
     getDetails() {
-        return "Translation Vector: (" + this.translationVector.x + ", " + this.translationVector.y + ")";
+        return "Translation Vector: (" + this.translationVector.x.toFixed(2) + ", " + this.translationVector.y.toFixed(2) + ")";
     }
 
     setupScene(scene, object) {
@@ -210,7 +210,7 @@ class Orientation extends Transformation {
     getName() { return "Orientation" }
 
     getDetails() {
-        return "Orientation Angle: " + THREE.MathUtils.radToDeg(this.orientationAngle).toPrecision(4) + "º";
+        return "Orientation Angle: " + THREE.MathUtils.radToDeg(this.orientationAngle).toFixed(2) + "º";
     }
 
     setupScene(scene, object) {
@@ -273,7 +273,7 @@ class Rotation extends Transformation {
     getName() { return "Rotation" }
 
     getDetails() {
-        return "Rotation Pivot: (" + this.pivot.x + ", " + this.pivot.y + ")\nRotation Angle: " + THREE.MathUtils.radToDeg(this.rotationAngle).toPrecision(4) + "º";
+        return "Rotation Pivot: (" + this.pivot.x.toFixed(2) + ", " + this.pivot.y.toFixed(2) + ")\nRotation Angle: " + THREE.MathUtils.radToDeg(this.rotationAngle).toFixed(2) + "º";
     }
 
     setupScene(scene, object) {
@@ -365,7 +365,7 @@ class Scale extends Transformation {
     getName() { return "Scale" }
 
     getDetails() {
-        return "Scale Vector: (" + this.scaleVector.x + ", " + this.scaleVector.y + ")";
+        return "Scale Vector: (" + this.scaleVector.x.toFixed(2) + ", " + this.scaleVector.y.toFixed(2) + ")";
     }
 
     setupScene(scene, object) {
