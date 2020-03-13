@@ -89,23 +89,20 @@ class Renderer {
             // Create the frame elements and timeline
             let rowDuration = row[row.length-1].finalTimestamp - row[0].initialTimestamp;
             let end = Math.min(info.start + this.maxFramesPerPage, row.length);
-            let frameId = info.start;
             for(let frameIndex = 0; frameIndex < row.length; frameIndex++) {        
                 let frame = row[frameIndex];
 
                 // Create timeline item
-                let timelineItem = this.initTimelineItem(frame, rowWrapper, rowDuration);
+                let timelineItem = this.initTimelineItem(frame, rowWrapper, frameIndex, rowDuration);
 
                 // Check if frame is visible
                 if (frameIndex >= info.start && frameIndex < end) {
                     // Create new frame element
-                    this.initFrame(frame, frameId, rowWrapper);
+                    this.initFrame(frame, frameIndex, rowWrapper);
 
                     // Add to visible frame
                     timelineItem.classList.add("frame-visible");
                     visibleFramesInRow.frameObjects.push(frame);
-
-                    frameId++;
                 }
             }
 
@@ -127,13 +124,14 @@ class Renderer {
         rowWrapper.rowFramesElement = rowWrapper.rowElement.getElementsByClassName('row-frames')[0];
 
         rowWrapper.rowElement.setAttribute("data-row-id", infoIndex);
+        rowWrapper.rowTimeline.setAttribute("data-row-id", infoIndex);
         this.contentElement.appendChild(rowWrapper.rowContainer);
         this.controller.setNavigationEvents(rowWrapper.rowElement);
         
         return rowWrapper;
     }
 
-    initFrame(frame, frameId, rowWrapper) {
+    initFrame(frame, frameIndex, rowWrapper) {
         // Create a frame HTML element from the template
         let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
         let descriptionElement = frameElement.getElementsByClassName("description")[0];
@@ -141,7 +139,7 @@ class Renderer {
         descriptionElement.title = frame.transformation.getDetails();
         $(descriptionElement).tooltip();
         this.controller.setFrameDetailEvents(frameElement);
-        frameElement.setAttribute("data-frame-id", frameId);
+        frameElement.setAttribute("data-frame-id", frameIndex);
         rowWrapper.rowFramesElement.appendChild(frameElement);
         frame.frameElement = frameElement;
 
@@ -149,13 +147,17 @@ class Renderer {
         frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
     }
 
-    initTimelineItem(frame, rowWrapper, rowDuration) {
+    initTimelineItem(frame, rowWrapper, frameId, rowDuration) {
         // Create the div and set its width in relation to its duration
         let frameDuration = frame.finalTimestamp - frame.initialTimestamp;
         let timelineItem = document.createElement("div");
+        timelineItem.setAttribute("type", "button");
         timelineItem.classList.add("timeline-item");
+        timelineItem.setAttribute("data-frame-id", frameId);
         timelineItem.style.width = (frameDuration / rowDuration) * 100 + '%';
         rowWrapper.rowTimeline.appendChild(timelineItem);
+        this.controller.setTimelineItemEvent(timelineItem);
+
         return timelineItem;
     }
 

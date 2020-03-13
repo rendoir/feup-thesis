@@ -23,6 +23,11 @@ canvas {
     z-index: -1; // For elements to appear on top of the canvas
 }
 
+#canvas-fullscreen {
+    pointer-events: none;
+    z-index: 1;
+}
+
 .storyboard-frame {
     position: relative;
     display: inline-block;
@@ -64,7 +69,7 @@ canvas {
 }
 
 .timeline {
-    height: 30px;
+    height: 25px;
     margin-top: 8px;
 
     .timeline-item {

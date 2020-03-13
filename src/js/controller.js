@@ -23,11 +23,6 @@ class Controller {
             start: 0,
             zoomedFromFrame: -1
         });
-        // TODO: Remove when zoom is implemented. This is just for testing.
-        /*this.visibleFramesInfo.push({
-            start: 2,
-            zoomedFromFrame: 1,
-        });*/
 
         this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
@@ -89,6 +84,23 @@ class Controller {
             });
             this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
         }
+    }
+
+    setTimelineItemEvent(item) {
+        item.onclick = this.onTimelineItemClick.bind(this);
+    }
+
+    onTimelineItemClick(event) {
+        // Get frame and row
+        let frameId = event.target.getAttribute("data-frame-id");
+        let row = event.target.closest(".timeline");
+        let rowId = row.getAttribute("data-row-id");
+        //console.log(`Row: ${rowId} | Frame: ${frameId}`);
+
+        // Set start to the frame clicked
+        this.visibleFramesInfo[rowId].start = parseInt(frameId);
+        //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
+        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
     }
 
     getTotalNumberFramesInRow(rowId) {
