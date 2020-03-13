@@ -11,6 +11,9 @@ class Frame {
         this.childFrames = [];
         this.uid = Frame.count;
         Frame.count += 1;
+        
+        // HTML elements
+        this.frameElement = null;
 
         this.setupScene();
     }

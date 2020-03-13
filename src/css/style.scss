@@ -63,6 +63,28 @@ canvas {
     }
 }
 
+.timeline {
+    height: 40px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+
+    .timeline-item {
+        display: inline-block;
+        height: 100%;
+        border: solid thin #444;
+        border-right: none;
+    }
+
+    div:last-child.timeline-item {
+        border-right: solid thin #444;
+    }
+}
+
+.row-container {
+    display: flex;
+    flex-direction: column;
+}
+
 /* Buttons */
 .btn-nav {
     font-size: 2rem;

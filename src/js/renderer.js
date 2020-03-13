@@ -1,4 +1,5 @@
 const THREE = require('three');
+const RowWrapper = require('./row');
 
 class Renderer {
     constructor() {
@@ -18,7 +19,7 @@ class Renderer {
 
         // Visible Frames is an array of objects
         // The index in the array is the depth
-        // Each entry has the frame content (storyboard), frame HTML element and scene elements
+        // Each entry has the frame content (storyboard), and a row wrapper
         this.visibleFrames = [];
 
         // Init content and template
@@ -80,39 +81,33 @@ class Renderer {
             // Exit if there are no frames
             if (frames.length === 0) continue;
 
+            // Create a new row element
+            let rowWrapper = this.initRow(infoIndex);
+
             // Init visible frames
             let visibleFramesInRow = {
                 frameObjects: [],
-                frameElements: [],
-                scenes: []
+                rowWrapper: rowWrapper
             };
 
-            // Create a new row element
-            let rowElement = this.rowTemplate.content.cloneNode(true).firstElementChild;
-            rowElement.setAttribute("data-row-id", infoIndex);
-            this.contentElement.appendChild(rowElement);
-            this.controller.setNavigationEvents(rowElement);
+            // Create timeline
+            row.forEach(frame => {
+                // Create timeline item
+                // TODO: ADJUST SIZES TO FRAME DURATION
+                let timelineItem = document.createElement("div");
+                timelineItem.classList.add("timeline-item");
+                timelineItem.style.width = (1 / row.length) * 100 + '%';
+                rowWrapper.rowTimeline.appendChild(timelineItem);
+            });
 
             // Create the frame elements
             let frameId = info.start;
             frames.forEach(frame => {        
-                // Create a frame HTML element from the template
-                let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
-                let descriptionElement = frameElement.getElementsByClassName("description")[0];
-                descriptionElement.innerHTML = frame.transformation.getName();
-                descriptionElement.title = frame.transformation.getDetails();
-                $(descriptionElement).tooltip();
-                this.controller.setFrameDetailEvents(frameElement);
-                frameElement.setAttribute("data-frame-id", frameId);
-                rowElement.getElementsByClassName('row-frames')[0].appendChild(frameElement);
-        
-                // Save the scene element in the scene object and append the element
-                frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
+                // Create new frame element
+                this.initFrame(frame, frameId, rowWrapper);
 
                 // Add to visible frame
-                visibleFramesInRow.scenes.push(frame.scene);
                 visibleFramesInRow.frameObjects.push(frame);
-                visibleFramesInRow.frameElements.push(frameElement);
 
                 // Increment frameId
                 frameId++;
@@ -126,6 +121,36 @@ class Renderer {
         }
 
         this.shouldRender = true;
+    }
+
+    initRow(infoIndex) {
+        let rowWrapper = new RowWrapper();
+        rowWrapper.rowContainer = this.rowTemplate.content.cloneNode(true).firstElementChild;
+        rowWrapper.rowElement = rowWrapper.rowContainer.getElementsByClassName("storyboard-row")[0];
+        rowWrapper.rowTimeline = rowWrapper.rowContainer.getElementsByClassName("timeline")[0];
+        rowWrapper.rowFramesElement = rowWrapper.rowElement.getElementsByClassName('row-frames')[0];
+
+        rowWrapper.rowElement.setAttribute("data-row-id", infoIndex);
+        this.contentElement.appendChild(rowWrapper.rowContainer);
+        this.controller.setNavigationEvents(rowWrapper.rowElement);
+        
+        return rowWrapper;
+    }
+
+    initFrame(frame, frameId, rowWrapper) {
+        // Create a frame HTML element from the template
+        let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
+        let descriptionElement = frameElement.getElementsByClassName("description")[0];
+        descriptionElement.innerHTML = frame.transformation.getName();
+        descriptionElement.title = frame.transformation.getDetails();
+        $(descriptionElement).tooltip();
+        this.controller.setFrameDetailEvents(frameElement);
+        frameElement.setAttribute("data-frame-id", frameId);
+        rowWrapper.rowFramesElement.appendChild(frameElement);
+        frame.frameElement = frameElement;
+
+        // Save the scene element in the scene object and append the element
+        frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
     }
 
     renderLoop() {
@@ -163,9 +188,15 @@ class Renderer {
             const visibleFramesInRow = this.visibleFrames[i];
             const rowInfo = this.visibleFramesInfo[i];
 
+            // Adjust timeline
+            let rowFramesRect = visibleFramesInRow.rowWrapper.rowFramesElement.getBoundingClientRect();
+            visibleFramesInRow.rowWrapper.rowTimeline.style.width = rowFramesRect.width + "px";
+            visibleFramesInRow.rowWrapper.rowTimeline.style.marginLeft = rowFramesRect.x + "px";
+            visibleFramesInRow.rowWrapper.rowTimeline.style.transform = `translateX(${window.scrollX}px)`;
+
             // Render scenes
-            for (let j = 0; j < visibleFramesInRow.scenes.length; j++) {
-                const scene = visibleFramesInRow.scenes[j];
+            for (let j = 0; j < visibleFramesInRow.frameObjects.length; j++) {
+                const scene = visibleFramesInRow.frameObjects[j].scene;
                 this.renderScene(scene);
             }
 
@@ -204,21 +235,21 @@ class Renderer {
             let previousRowInfo = this.visibleFramesInfo[i-1];
             let previousRowFrames = this.visibleFrames[i-1];
             if(rowInfo.zoomedFromFrame >= previousRowInfo.start && 
-                rowInfo.zoomedFromFrame <= previousRowFrames.frameElements.length + previousRowInfo.start - 1) {
+                rowInfo.zoomedFromFrame <= previousRowFrames.frameObjects.length + previousRowInfo.start - 1) {
                     // The frame is visible -> Draw the two lines from it to the next row
 
                     // Information of the frame that was zoomed
-                    let previousFrameElement = previousRowFrames.frameElements[rowInfo.zoomedFromFrame - previousRowInfo.start];
+                    let previousFrameElement = previousRowFrames.frameObjects[rowInfo.zoomedFromFrame - previousRowInfo.start].frameElement;
                     let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
                     // Get information of the first frame in the zoomed row
-                    let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                    let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
                     // Draw left line
                     this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
                         firstFrameRect.left, firstFrameRect.top);
                     
                     // Get information of the last frame in the zoomed row
-                    let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                    let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
                     // Draw left line
                     this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
                         lastFrameRect.right, firstFrameRect.top);
@@ -227,33 +258,33 @@ class Renderer {
 
                     if (rowInfo.zoomedFromFrame < previousRowInfo.start) {
                         // Select the left-most frame
-                        let previousFrameElement = previousRowFrames.frameElements[0];
+                        let previousFrameElement = previousRowFrames.frameObjects[0].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
                         // Get information of the first frame in the zoomed row
-                        let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                        let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
                             firstFrameRect.left, firstFrameRect.top);
                         
                         // Get information of the last frame in the zoomed row
-                        let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                        let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
                             lastFrameRect.right, firstFrameRect.top);
                     } else {
                         // Select the right-most frame
-                        let previousFrameElement = previousRowFrames.frameElements[previousRowFrames.frameElements.length-1];
+                        let previousFrameElement = previousRowFrames.frameObjects[previousRowFrames.frameObjects.length-1].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
                         // Get information of the first frame in the zoomed row
-                        let firstFrameRect = visibleFramesInRow.frameElements[0].getBoundingClientRect();
+                        let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
                             firstFrameRect.left, firstFrameRect.top);
                         
                         // Get information of the last frame in the zoomed row
-                        let lastFrameRect = visibleFramesInRow.frameElements[visibleFramesInRow.frameElements.length-1].getBoundingClientRect();
+                        let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
                             lastFrameRect.right, firstFrameRect.top);
