@@ -74,12 +74,8 @@ class Renderer {
                 row = this.storyboard.frames; // Initial set of frames (depth = 0)
             else row = previousRow[info.zoomedFromFrame].childFrames; // Access the element that got zoomed from the previous row
 
-            // Retrieve the frames for the row
-            // From info start to the minimum between the total number of frames of the row and the start plus the frames per page
-            let frames = row.slice(info.start, Math.min(info.start + this.maxFramesPerPage, row.length));
-
             // Exit if there are no frames
-            if (frames.length === 0) continue;
+            if (row.length === 0) continue;
 
             // Create a new row element
             let rowWrapper = this.initRow(infoIndex);
@@ -90,28 +86,28 @@ class Renderer {
                 rowWrapper: rowWrapper
             };
 
-            // Create timeline
-            row.forEach(frame => {
-                // Create timeline item
-                // TODO: ADJUST SIZES TO FRAME DURATION
-                let timelineItem = document.createElement("div");
-                timelineItem.classList.add("timeline-item");
-                timelineItem.style.width = (1 / row.length) * 100 + '%';
-                rowWrapper.rowTimeline.appendChild(timelineItem);
-            });
-
-            // Create the frame elements
+            // Create the frame elements and timeline
+            let rowDuration = row[row.length-1].finalTimestamp - row[0].initialTimestamp;
+            let end = Math.min(info.start + this.maxFramesPerPage, row.length);
             let frameId = info.start;
-            frames.forEach(frame => {        
-                // Create new frame element
-                this.initFrame(frame, frameId, rowWrapper);
+            for(let frameIndex = 0; frameIndex < row.length; frameIndex++) {        
+                let frame = row[frameIndex];
 
-                // Add to visible frame
-                visibleFramesInRow.frameObjects.push(frame);
+                // Create timeline item
+                let timelineItem = this.initTimelineItem(frame, rowWrapper, rowDuration);
 
-                // Increment frameId
-                frameId++;
-            });
+                // Check if frame is visible
+                if (frameIndex >= info.start && frameIndex < end) {
+                    // Create new frame element
+                    this.initFrame(frame, frameId, rowWrapper);
+
+                    // Add to visible frame
+                    timelineItem.classList.add("frame-visible");
+                    visibleFramesInRow.frameObjects.push(frame);
+
+                    frameId++;
+                }
+            }
 
             // Add to visible frames
             this.visibleFrames.push(visibleFramesInRow);
@@ -151,6 +147,16 @@ class Renderer {
 
         // Save the scene element in the scene object and append the element
         frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
+    }
+
+    initTimelineItem(frame, rowWrapper, rowDuration) {
+        // Create the div and set its width in relation to its duration
+        let frameDuration = frame.finalTimestamp - frame.initialTimestamp;
+        let timelineItem = document.createElement("div");
+        timelineItem.classList.add("timeline-item");
+        timelineItem.style.width = (frameDuration / rowDuration) * 100 + '%';
+        rowWrapper.rowTimeline.appendChild(timelineItem);
+        return timelineItem;
     }
 
     renderLoop() {

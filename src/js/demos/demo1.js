@@ -3,6 +3,7 @@ const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('../transformation');
 
+let timestamp = 0;
 
 /* ----- OBJECT ----- */
 let vertices = [];
@@ -218,23 +219,29 @@ let multiple = new Multiple([new Translation(new THREE.Vector2(50, 100)), new Or
 /* ----- FRAMES ----- */
 let frames = [];
 
-let frame0_0 = new Frame(objectScale, scale); frames.push(frame0_0);
-let frame0_1 = new Frame(objectOrientation, orientation); frames.push(frame0_1);
-let frame0_2 = new Frame(objectTranslation, translation); frames.push(frame0_2);
-let frame0_3 = new Frame(objectUnknown, unknown); frames.push(frame0_3);
-let frame0_4 = new Frame(objectImmutability, immutability); frames.push(frame0_4);
-let frame0_5 = new Frame(objectMultiple, multiple); frames.push(frame0_5);
+let frame0_0 = new Frame(objectScale, scale, timestamp, stepTime()); frames.push(frame0_0);
+let frame0_1 = new Frame(objectOrientation, orientation, timestamp, stepTime()); frames.push(frame0_1);
+let frame0_2 = new Frame(objectTranslation, translation, timestamp, stepTime()); frames.push(frame0_2);
+let frame0_3 = new Frame(objectUnknown, unknown, timestamp, stepTime()); frames.push(frame0_3);
+let frame0_4 = new Frame(objectImmutability, immutability, timestamp, stepTime()); frames.push(frame0_4);
+let frame0_5 = new Frame(objectMultiple, multiple, timestamp, stepTime()); frames.push(frame0_5);
 
-let frame1_0 = new Frame(objectOrientation, orientation); frame0_3.childFrames.push(frame1_0);
-let frame1_1 = new Frame(objectScale, scale); frame0_3.childFrames.push(frame1_1);
-let frame1_2 = new Frame(objectRotation, rotation); frame0_3.childFrames.push(frame1_2);
-let frame1_3 = new Frame(objectTranslation, translation); frame0_3.childFrames.push(frame1_3);
+let frame1_0 = new Frame(objectOrientation, orientation, timestamp, stepTime()); frame0_3.childFrames.push(frame1_0);
+let frame1_1 = new Frame(objectScale, scale, timestamp, stepTime()); frame0_3.childFrames.push(frame1_1);
+let frame1_2 = new Frame(objectRotation, rotation, timestamp, stepTime()); frame0_3.childFrames.push(frame1_2);
+let frame1_3 = new Frame(objectTranslation, translation, timestamp, stepTime()); frame0_3.childFrames.push(frame1_3);
 
-let frame2_0 = new Frame(objectTranslation, translation); frame1_0.childFrames.push(frame2_0);
-let frame2_1 = new Frame(objectScale, scale); frame1_0.childFrames.push(frame2_1);
-let frame2_2 = new Frame(objectOrientation, orientation); frame1_0.childFrames.push(frame2_2);
+let frame2_0 = new Frame(objectTranslation, translation, timestamp, stepTime()); frame1_0.childFrames.push(frame2_0);
+let frame2_1 = new Frame(objectScale, scale, timestamp, stepTime()); frame1_0.childFrames.push(frame2_1);
+let frame2_2 = new Frame(objectOrientation, orientation, timestamp, stepTime()); frame1_0.childFrames.push(frame2_2);
 
-let frame3_0 = new Frame(objectTranslation, translation); frame2_0.childFrames.push(frame3_0);
+let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime()); frame2_0.childFrames.push(frame3_0);
+
+
+function stepTime() {
+    timestamp += Math.random() * 1000 + 10;
+    return timestamp;
+}
 
 
 module.exports = frames;

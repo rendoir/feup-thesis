@@ -5,12 +5,15 @@ const THREE = require('three');
  * in the time the frame represents 
  */
 class Frame {
-    constructor(object, transformation) {
+    constructor(object, transformation, initialTimestamp, finalTimestamp) {
         this.object = object;
         this.transformation = transformation;
         this.childFrames = [];
         this.uid = Frame.count;
         Frame.count += 1;
+
+        this.initialTimestamp = initialTimestamp;
+        this.finalTimestamp = finalTimestamp;
         
         // HTML elements
         this.frameElement = null;

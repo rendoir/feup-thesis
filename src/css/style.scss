@@ -64,15 +64,19 @@ canvas {
 }
 
 .timeline {
-    height: 40px;
-    margin-top: 5px;
-    margin-bottom: 5px;
+    height: 30px;
+    margin-top: 8px;
 
     .timeline-item {
         display: inline-block;
         height: 100%;
         border: solid thin #444;
         border-right: none;
+        background-color: #e0e0e0;
+    }
+    
+    .frame-visible {
+        background-color: #f1a3a3;
     }
 
     div:last-child.timeline-item {
