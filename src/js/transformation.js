@@ -31,13 +31,14 @@ class Transformation {
         this.sceneBoundingBox.getCenter(boundingBoxCenter);
         this.sceneBoundingBox.getSize(boundingBoxSize);
 
-        let cameraPlaneOffset = 0.1 * Math.max(boundingBoxSize.x, boundingBoxSize.y);
+        let cameraPlaneOffset = 0.2 * Math.max(boundingBoxSize.x, boundingBoxSize.y);
         let cameraLeft = Math.min(this.sceneBoundingBox.min.x, boundingBoxCenter.x - boundingBoxSize.y / 2) - cameraPlaneOffset;
         let cameraRight = Math.max(this.sceneBoundingBox.max.x, boundingBoxCenter.x + boundingBoxSize.y / 2) + cameraPlaneOffset;
         let cameraBottom = Math.min(this.sceneBoundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
         let cameraTop = Math.max(this.sceneBoundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
 
         let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -500, 500);
+        camera.position.y += cameraPlaneOffset / 2; // Compensate for the overlay
         
         // Save objects inside scene
         this.scene.userData.camera = camera;
