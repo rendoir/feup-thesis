@@ -47,7 +47,6 @@ canvas {
         color: #888;
         font-family: sans-serif;
         font-size: large;
-        width: 200px;
         padding: 0.25em;
     }
 }
@@ -101,6 +100,15 @@ canvas {
     margin-right: 1rem;
 }
 
+/* Tooltips */
 .tooltip-inner {
     white-space: pre-line; // Allow line breaks in tooltips
+}
+
+/* Overlay */
+.overlay {
+    display: inline-block;
+    font-size: 60%;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 5px;
 }

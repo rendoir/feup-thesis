@@ -15,6 +15,8 @@ class Transformation {
     getName() { throw "Abstract method getName not implemented" }
 
     getDetails() { throw "Abstract method getDetails not implemented" }
+
+    getOverlayDetails() { throw "Abstract method getOverlayDetails not implemented" }
     
     setupScene(scene, object) { 
         this.scene = scene;
@@ -175,6 +177,10 @@ class Translation extends Transformation {
         return "Translation Vector: (" + this.translationVector.x.toFixed(2) + ", " + this.translationVector.y.toFixed(2) + ")";
     }
 
+    getOverlayDetails() {
+        return "T: (" + this.translationVector.x.toFixed(2) + ", " + this.translationVector.y.toFixed(2) + ")";
+    }
+
     setupScene(scene, object) {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
@@ -211,6 +217,10 @@ class Orientation extends Transformation {
 
     getDetails() {
         return "Orientation Angle: " + THREE.MathUtils.radToDeg(this.orientationAngle).toFixed(2) + "º";
+    }
+
+    getOverlayDetails() {
+        return "O: " + THREE.MathUtils.radToDeg(this.orientationAngle).toFixed(2) + "º";
     }
 
     setupScene(scene, object) {
@@ -274,6 +284,11 @@ class Rotation extends Transformation {
 
     getDetails() {
         return "Rotation Pivot: (" + this.pivot.x.toFixed(2) + ", " + this.pivot.y.toFixed(2) + ")\nRotation Angle: " + THREE.MathUtils.radToDeg(this.rotationAngle).toFixed(2) + "º";
+    }
+
+    getOverlayDetails() {
+        return "R: " + THREE.MathUtils.radToDeg(this.rotationAngle).toFixed(2) + "º @ (" +
+            this.pivot.x.toFixed(2) + ", " + this.pivot.y.toFixed(2) + ")";
     }
 
     setupScene(scene, object) {
@@ -368,6 +383,10 @@ class Scale extends Transformation {
         return "Scale Vector: (" + this.scaleVector.x.toFixed(2) + ", " + this.scaleVector.y.toFixed(2) + ")";
     }
 
+    getOverlayDetails() {
+        return "S: (" + this.scaleVector.x.toFixed(2) + ", " + this.scaleVector.y.toFixed(2) + ")";
+    }
+
     setupScene(scene, object) {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
@@ -389,6 +408,8 @@ class Immutability extends Transformation {
     getName() { return "Immutability" }
 
     getDetails() { return "The object had no substantial transformations" }
+
+    getOverlayDetails() { return "" }
     
     setupScene(scene, object) { 
         super.setupScene(scene, object);
@@ -415,6 +436,8 @@ class Unknown extends Transformation {
     getName() { return "Unknown" }
 
     getDetails() { return "The object suffered an unknown transformation" }
+
+    getOverlayDetails() { return "" }
     
     setupScene(scene, object) { 
         super.setupScene(scene, object);
@@ -435,6 +458,14 @@ class Multiple extends Transformation {
         let details = "The object suffered multiple transformations:\n";
         this.transformations.forEach(transformation => {
             details += transformation.getDetails() + '\n';
+        });
+        return details;
+    }
+
+    getOverlayDetails() {
+        let details = "";
+        this.transformations.forEach(transformation => {
+            details += transformation.getOverlayDetails() + '<br>';
         });
         return details;
     }

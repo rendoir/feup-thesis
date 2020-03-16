@@ -133,18 +133,21 @@ class Renderer {
 
     initFrame(frame, frameIndex, rowWrapper) {
         // Create a frame HTML element from the template
-        let frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
-        let descriptionElement = frameElement.getElementsByClassName("description")[0];
-        descriptionElement.innerHTML = frame.transformation.getName();
-        descriptionElement.title = frame.transformation.getDetails();
-        $(descriptionElement).tooltip();
-        this.controller.setFrameDetailEvents(frameElement);
-        frameElement.setAttribute("data-frame-id", frameIndex);
-        rowWrapper.rowFramesElement.appendChild(frameElement);
-        frame.frameElement = frameElement;
+        frame.frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
+        frame.overlayElement = frame.frameElement.getElementsByClassName("overlay")[0];
+        frame.descriptionElement = frame.frameElement.getElementsByClassName("description")[0];
+        
+        frame.overlayElement.innerHTML = frame.getOverlayDetails();
+        frame.descriptionElement.innerHTML = frame.transformation.getName();
+        frame.descriptionElement.title = frame.transformation.getDetails();
+        $(frame.descriptionElement).tooltip();
+
+        this.controller.setFrameDetailEvents(frame.frameElement);
+        frame.frameElement.setAttribute("data-frame-id", frameIndex);
+        rowWrapper.rowFramesElement.appendChild(frame.frameElement);
 
         // Save the scene element in the scene object and append the element
-        frame.scene.userData.element = frameElement.getElementsByClassName("scene")[0];
+        frame.scene.userData.element = frame.frameElement.getElementsByClassName("scene")[0];
     }
 
     initTimelineItem(frame, rowWrapper, frameId, rowDuration) {

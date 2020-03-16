@@ -17,6 +17,8 @@ class Frame {
         
         // HTML elements
         this.frameElement = null;
+        this.descriptionElement = null;
+        this.overlayElement = null;
 
         this.setupScene();
     }
@@ -26,6 +28,18 @@ class Frame {
 
         // The transformation class initializes the objects in the scene
         this.transformation.setupScene(this.scene, this.object);
+    }
+
+    getOverlayDetails() {
+        let details = "";
+
+        // Timestamps
+        details += "[" + this.initialTimestamp + ", " + this.finalTimestamp + "]" + "<br>";
+        
+        // Transformation-specific
+        details += this.transformation.getOverlayDetails();
+
+        return details;
     }
 }
 

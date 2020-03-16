@@ -239,7 +239,7 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 
 function stepTime() {
-    timestamp += Math.random() * 1000 + 10;
+    timestamp += Math.ceil(Math.random() * 1000 + 10);
     return timestamp;
 }
 
