@@ -15,7 +15,6 @@ class Grid extends THREE.Object3D {
 
         let matLite = new THREE.MeshBasicMaterial( {
             color: textColor,
-            transparent: false,
             side: THREE.DoubleSide
         } );
         
@@ -26,48 +25,48 @@ class Grid extends THREE.Object3D {
     
         for ( let i = 0, j = 0, k = - halfSize + step; i < divisions - 1; i ++, k += step ) {
     
-            vertices.push( - halfSize, 0, k, halfSize, 0, k );
-            vertices.push( k, 0, - halfSize, k, 0, halfSize );
+            vertices.push( - halfSize, k, 0, halfSize, k, 0 );
+            vertices.push( k, - halfSize, 0, k, halfSize, 0 );
 
-            drawText(-halfSize, k, this, font, matLite);
-            //drawText(halfSize, k, this, font, matLite);
-            drawText(k, -halfSize, this, font, matLite); 
-            //drawText(k, halfSize, this, font, matLite); 
+            // Y-axis
+            this.drawText(-halfSize, k, font, matLite, false);
+            
+            // X-axis
+            this.drawText(k, halfSize, font, matLite, true);
             
         }
     
         let geometry = new THREE.BufferGeometry();
         geometry.setAttribute( 'position', new THREE.Float32BufferAttribute( vertices, 3 ) );
     
-        let material = new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 0.5 } );
+        let material = new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 0.25 } );
     
         this.add ( new THREE.LineSegments( geometry, material ) );
     }
+
+
+    drawText(x, y, font, mat, xAxis) {
+        // TODO: SIZE RELATIVE TO AABB SIZE
+        // TODO: SHAPE CACHE
+        // TODO: ADJUST MESSAGE TO TRANSLATION (ADD CENTER)
+        let message = xAxis ? x.toFixed(2).toString() : y.toFixed(2).toString();
+    
+        let shapes = font.generateShapes( message, 50 );
+    
+        let geometry = new THREE.ShapeBufferGeometry( shapes );
+    
+        geometry.computeBoundingBox();
+    
+        let yMid = !xAxis ? 0 : - ( geometry.boundingBox.max.y - geometry.boundingBox.min.y );
+    
+        geometry.translate( 0, yMid, 0 );
+    
+        let text = new THREE.Mesh( geometry, mat );
+        text.position.set(x, y, 0);
+        this.add( text );
+    }
 }
 
-function drawText(x, z, thisObject, font, mat) {
-    // TODO: SIZE RELATIVE TO AABB SIZE
-    // TODO: SHAPE CACHE
-    // TODO: DISPLAY ONLY 1 COORDINATE
-    // TODO: ADJUST GEOMETRY TRANSLATION
-    // TODO: ADJUST MESSAGE TO TRANSLATION
-	let message = x.toFixed(2).toString() + "  " + z.toFixed(2).toString();
 
-	let shapes = font.generateShapes( message, 50 );
-
-	let geometry = new THREE.ShapeBufferGeometry( shapes );
-
-	geometry.computeBoundingBox();
-
-	let xMid = - 0.5 * ( geometry.boundingBox.max.x - geometry.boundingBox.min.x );
-	let yMid = - 0.5 * ( geometry.boundingBox.max.y - geometry.boundingBox.min.y );
-
-	geometry.translate( xMid, yMid, 0 );
-
-	let text = new THREE.Mesh( geometry, mat );
-	text.rotation.x = - Math.PI / 2;
-	text.position.set(x, 0, z);
-	thisObject.add( text );
-}
 
 module.exports = Grid;

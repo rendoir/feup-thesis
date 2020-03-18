@@ -57,7 +57,6 @@ class Transformation {
         // Set transformations
         let center = new THREE.Vector3(); 
         this.sceneBoundingBox.getCenter(center);
-        grid.rotation.x = Math.PI / 2;
         grid.position.set(center.x, center.y - boxSize*CAMERA_PADDING/2, -250);
 
         this.scene.add(grid);
