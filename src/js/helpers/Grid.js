@@ -4,8 +4,10 @@ const fontJson = require('three/examples/fonts/helvetiker_regular.typeface.json'
 var font = null;
 
 class Grid extends THREE.Object3D {
-    constructor(size, divisions) {
+    constructor(size, divisions, center) {
         super();
+
+        this.center = center;
 
         // Text
         if( font == null )
@@ -23,7 +25,7 @@ class Grid extends THREE.Object3D {
     
         let vertices = [];
     
-        for ( let i = 0, j = 0, k = - halfSize + step; i < divisions - 1; i ++, k += step ) {
+        for ( let i = 0, k = - halfSize + step; i < divisions - 1; i ++, k += step ) {
     
             vertices.push( - halfSize, k, 0, halfSize, k, 0 );
             vertices.push( k, - halfSize, 0, k, halfSize, 0 );
@@ -41,15 +43,19 @@ class Grid extends THREE.Object3D {
     
         let material = new THREE.LineBasicMaterial( { color: 0x000000, transparent: true, opacity: 0.25 } );
     
-        this.add ( new THREE.LineSegments( geometry, material ) );
+        let lineSegments = new THREE.LineSegments( geometry, material );
+        lineSegments.position.set(center.x, center.y, center.z);
+        this.add ( lineSegments );
     }
 
 
     drawText(x, y, font, mat, xAxis) {
         // TODO: SIZE RELATIVE TO AABB SIZE
         // TODO: SHAPE CACHE
-        // TODO: ADJUST MESSAGE TO TRANSLATION (ADD CENTER)
-        let message = xAxis ? x.toFixed(2).toString() : y.toFixed(2).toString();
+        let wx = x + this.center.x;
+        let wy = y + this.center.y;
+
+        let message = xAxis ? wx.toFixed(2).toString() : wy.toFixed(2).toString();
     
         let shapes = font.generateShapes( message, 50 );
     
@@ -62,7 +68,7 @@ class Grid extends THREE.Object3D {
         geometry.translate( 0, yMid, 0 );
     
         let text = new THREE.Mesh( geometry, mat );
-        text.position.set(x, y, 0);
+        text.position.set(wx, wy, this.center.z);
         this.add( text );
     }
 }

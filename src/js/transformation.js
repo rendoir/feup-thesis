@@ -5,9 +5,12 @@ const Grid = require('./helpers/Grid');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
+const GRID_DEPTH = -250;
+
 const OBJECT_COLOR = 0xff0000;
 
 const CAMERA_PADDING = 0.25;
+const GRID_DIVISIONS = 3;
 
 /**
  * Abstract class for an object transformation in a frame
@@ -48,16 +51,15 @@ class Transformation {
     }
 
     setupGrid() {
+        let center = new THREE.Vector3(); 
+        this.sceneBoundingBox.getCenter(center);
+        
         // Grid size proportional to scene bounding box
         // Keep divisions constant
         let boxSize = this.getMaxSceneBoxSize();
         let gridSize = boxSize + boxSize*CAMERA_PADDING*2;
-        let grid = new Grid(gridSize, 3);
-
-        // Set transformations
-        let center = new THREE.Vector3(); 
-        this.sceneBoundingBox.getCenter(center);
-        grid.position.set(center.x, center.y - boxSize*CAMERA_PADDING/2, -250);
+        let gridCenter = new THREE.Vector3(center.x, center.y - boxSize*CAMERA_PADDING/2, GRID_DEPTH)
+        let grid = new Grid(gridSize, GRID_DIVISIONS, gridCenter);
 
         this.scene.add(grid);
     }
