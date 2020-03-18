@@ -185,7 +185,7 @@ class Renderer {
         this.renderer.setScissorTest(false);
         this.renderer.clear();
     
-        this.renderer.setClearColor(0xe0e0e0);
+        this.renderer.setClearColor(0xffffff);
         this.renderer.setScissorTest(true);
 
         // Clear fullscreen canvas

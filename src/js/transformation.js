@@ -1,10 +1,13 @@
 const THREE = require('three');
 const CurvedArrow = require('./helpers/CurvedArrow');
 const EllipseArc = require('./helpers/EllipseArc');
+const Grid = require('./helpers/Grid');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
 const OBJECT_COLOR = 0xff0000;
+
+const CAMERA_PADDING = 0.25;
 
 /**
  * Abstract class for an object transformation in a frame
@@ -31,7 +34,7 @@ class Transformation {
         this.sceneBoundingBox.getCenter(boundingBoxCenter);
         this.sceneBoundingBox.getSize(boundingBoxSize);
 
-        let cameraPlaneOffset = 0.2 * Math.max(boundingBoxSize.x, boundingBoxSize.y);
+        let cameraPlaneOffset = CAMERA_PADDING * Math.max(boundingBoxSize.x, boundingBoxSize.y);
         let cameraLeft = Math.min(this.sceneBoundingBox.min.x, boundingBoxCenter.x - boundingBoxSize.y / 2) - cameraPlaneOffset;
         let cameraRight = Math.max(this.sceneBoundingBox.max.x, boundingBoxCenter.x + boundingBoxSize.y / 2) + cameraPlaneOffset;
         let cameraBottom = Math.min(this.sceneBoundingBox.min.y, boundingBoxCenter.y - boundingBoxSize.x / 2) - cameraPlaneOffset;
@@ -42,6 +45,22 @@ class Transformation {
         
         // Save objects inside scene
         this.scene.userData.camera = camera;
+    }
+
+    setupGrid() {
+        // Grid size proportional to scene bounding box
+        // Keep divisions constant
+        let boxSize = this.getMaxSceneBoxSize();
+        let gridSize = boxSize + boxSize*CAMERA_PADDING*2;
+        let grid = new Grid(gridSize, 3);
+
+        // Set transformations
+        let center = new THREE.Vector3(); 
+        this.sceneBoundingBox.getCenter(center);
+        grid.rotation.x = Math.PI / 2;
+        grid.position.set(center.x, center.y - boxSize*CAMERA_PADDING/2, -250);
+
+        this.scene.add(grid);
     }
 
     setupOnionSkinning() {
@@ -188,6 +207,7 @@ class Translation extends Transformation {
         this.setupTranslationArrow();
         this.setupLinearVertexMapping();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 
     setupTranslationArrow() {
@@ -230,6 +250,7 @@ class Orientation extends Transformation {
         this.setupRoundArrow();
         this.setupArcVertexMapping();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 
     setupRoundArrow() {
@@ -298,6 +319,7 @@ class Rotation extends Transformation {
         this.setupPivotArrow();
         this.setupArcVertexMapping();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 
     setupPivotArrow() {
@@ -393,6 +415,7 @@ class Scale extends Transformation {
         this.setupOnionSkinning();
         this.setupLinearVertexMapping();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 
     _getColor(i, nStates) {
@@ -416,6 +439,7 @@ class Immutability extends Transformation {
         super.setupScene(scene, object);
         this.setupInitialState();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 
     setupInitialState() {
@@ -444,6 +468,7 @@ class Unknown extends Transformation {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 }
 
@@ -475,6 +500,7 @@ class Multiple extends Transformation {
         super.setupScene(scene, object);
         this.setupOnionSkinning();
         this.setupSceneCamera();
+        this.setupGrid();
     }
 }
 
