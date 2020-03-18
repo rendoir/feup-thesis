@@ -1,17 +1,20 @@
 const THREE = require("three");
 
-const fontJson = require('three/examples/fonts/helvetiker_regular.typeface.json');
-var font = null;
+const FONT_JSON = require('three/examples/fonts/helvetiker_regular.typeface.json');
+var FONT = null;
+
+const SIZE_SCALE = 0.03;
 
 class Grid extends THREE.Object3D {
     constructor(size, divisions, center) {
         super();
 
         this.center = center;
+        this.size = size;
 
         // Text
-        if( font == null )
-            font = new THREE.Font( fontJson );
+        if( FONT == null )
+            FONT = new THREE.Font( FONT_JSON );
     
         let textColor = 0x006699;
 
@@ -31,10 +34,10 @@ class Grid extends THREE.Object3D {
             vertices.push( k, - halfSize, 0, k, halfSize, 0 );
 
             // Y-axis
-            this.drawText(-halfSize, k, font, matLite, false);
+            this.drawText(-halfSize, k, matLite, false);
             
             // X-axis
-            this.drawText(k, halfSize, font, matLite, true);
+            this.drawText(k, halfSize, matLite, true);
             
         }
     
@@ -49,15 +52,14 @@ class Grid extends THREE.Object3D {
     }
 
 
-    drawText(x, y, font, mat, xAxis) {
-        // TODO: SIZE RELATIVE TO AABB SIZE
+    drawText(x, y, mat, xAxis) {
         // TODO: SHAPE CACHE
         let wx = x + this.center.x;
         let wy = y + this.center.y;
 
         let message = xAxis ? wx.toFixed(2).toString() : wy.toFixed(2).toString();
     
-        let shapes = font.generateShapes( message, 50 );
+        let shapes = FONT.generateShapes( message, this.size * SIZE_SCALE );
     
         let geometry = new THREE.ShapeBufferGeometry( shapes );
     
