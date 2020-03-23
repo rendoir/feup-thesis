@@ -37,26 +37,26 @@ class Controller {
     onNavigationClickLeft(event) {
         // Get row from the button
         let row = event.srcElement.parentElement;
-        let rowId = row.getAttribute("data-row-id");
+        let rowId = parseInt(row.getAttribute("data-row-id"));
         
         // Decrement and clamp to zero
         this.visibleFramesInfo[rowId].start = 
             Math.max(this.visibleFramesInfo[rowId].start - Controller.rowNavigationStep, 0);
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     onNavigationClickRight() {
         // Get row from the button
         let row = event.target.closest(".storyboard-row");
-        let rowId = row.getAttribute("data-row-id");
+        let rowId = parseInt(row.getAttribute("data-row-id"));
         
         // Increment and clamp to total number of frames
         this.visibleFramesInfo[rowId].start = 
             Math.min(this.visibleFramesInfo[rowId].start + Controller.rowNavigationStep,
             this.getTotalNumberFramesInRow(rowId) - 1);
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     setFrameDetailEvents(frameElement) {
@@ -66,23 +66,29 @@ class Controller {
     onFrameClick(event) {
         // Get frame and row
         let frame = event.target.closest(".storyboard-frame");
-        let frameId = frame.getAttribute("data-frame-id");
+        let frameId = parseInt(frame.getAttribute("data-frame-id"));
         let row = frame.closest(".storyboard-row");
-        let rowId = row.getAttribute("data-row-id");
+        let rowId = parseInt(row.getAttribute("data-row-id"));
         //console.log(`Row: ${rowId} | Frame: ${frameId}`);
 
         // Make sure row is present in the visible frames
         let rowInfo = this.visibleFramesInfo[rowId];
         if( rowInfo !== undefined && rowInfo !== null ) {
-            // Clear all content after (bellow) this row
-            this.visibleFramesInfo = this.visibleFramesInfo.slice(0, parseInt(rowId)+1);
+            // Check if this frame is already zoomed
+            let frameIsZoomed = rowId+1 < this.visibleFramesInfo.length && this.visibleFramesInfo[rowId+1].zoomedFromFrame === frameId;
 
-            // Add a new row
-            this.visibleFramesInfo.push({
-                start: 0,
-                zoomedFromFrame: frameId
-            });
-            this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+            // Clear all content after (bellow) this row
+            this.visibleFramesInfo = this.visibleFramesInfo.slice(0, rowId+1);
+
+            if ( !frameIsZoomed ) {
+                // Add a new row
+                this.visibleFramesInfo.push({
+                    start: 0,
+                    zoomedFromFrame: frameId
+                });
+            }
+
+            this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
         }
     }
 
@@ -92,15 +98,15 @@ class Controller {
 
     onTimelineItemClick(event) {
         // Get frame and row
-        let frameId = event.target.getAttribute("data-frame-id");
+        let frameId = parseInt(event.target.getAttribute("data-frame-id"));
         let row = event.target.closest(".timeline");
-        let rowId = row.getAttribute("data-row-id");
+        let rowId = parseInt(row.getAttribute("data-row-id"));
         //console.log(`Row: ${rowId} | Frame: ${frameId}`);
 
         // Set start to the frame clicked
-        this.visibleFramesInfo[rowId].start = parseInt(frameId);
+        this.visibleFramesInfo[rowId].start = frameId;
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo); // TODO: Optimization: Develop an update function in the renderer
+        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     getTotalNumberFramesInRow(rowId) {
