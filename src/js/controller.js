@@ -52,9 +52,10 @@ class Controller {
         let rowId = parseInt(row.getAttribute("data-row-id"));
         
         // Increment and clamp to total number of frames
-        this.visibleFramesInfo[rowId].start = 
+        this.visibleFramesInfo[rowId].start = Math.max(0, 
             Math.min(this.visibleFramesInfo[rowId].start + Controller.rowNavigationStep,
-            this.getTotalNumberFramesInRow(rowId) - 1);
+                this.getTotalNumberFramesInRow(rowId) - this.renderer.maxFramesPerPage)
+        );
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
         this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
@@ -104,7 +105,8 @@ class Controller {
         //console.log(`Row: ${rowId} | Frame: ${frameId}`);
 
         // Set start to the frame clicked
-        this.visibleFramesInfo[rowId].start = frameId;
+        
+        this.visibleFramesInfo[rowId].start = Math.max(0, Math.min(frameId, this.getTotalNumberFramesInRow(rowId) - this.renderer.maxFramesPerPage));
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
         this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
     }
