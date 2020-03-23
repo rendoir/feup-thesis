@@ -1,8 +1,9 @@
 /* Variables */
 $vertical-padding: 2rem;
-$timeline-default-color: #e0e0e0;
+$timeline-invisible-color: #e0e0e0;
 $timeline-visible-color: #93acfd;
-$timeline-zoom-color: #5077f8;
+$timeline-zoom-visible-color: #5077f8;
+$timeline-zoom-invisible-color: #757575;
 $default-border: solid thin #444;
 $overlay-background: rgba(0, 0, 0, 0.1);
 
@@ -86,7 +87,7 @@ canvas {
         height: 100%;
         border: $default-border;
         border-right: none;
-        background-color: $timeline-default-color;
+        background-color: $timeline-invisible-color;
     }
     
     .frame-visible {
@@ -94,7 +95,11 @@ canvas {
     }
 
     .frame-zoom {
-        background-color: $timeline-zoom-color;
+        background-color: $timeline-zoom-invisible-color;
+    }
+
+    .frame-zoom.frame-visible {
+        background-color: $timeline-zoom-visible-color;
     }
 
     div:last-child.timeline-item {
