@@ -69,6 +69,7 @@ class Renderer {
         let previousRow = null;
         for (let infoIndex = 0; infoIndex < this.visibleFramesInfo.length; infoIndex++) {
             const info = this.visibleFramesInfo[infoIndex];
+            const nextInfo = this.visibleFramesInfo[infoIndex+1];
             
             // Retrieve the correct row from the storyboard
             let row;
@@ -105,6 +106,12 @@ class Renderer {
                     // Add to visible frame
                     timelineItem.classList.add("frame-visible");
                     visibleFramesInRow.frameObjects.push(frame);
+                }
+
+                // Check if frame is zoomed
+                if (nextInfo !== undefined && frameIndex === nextInfo.zoomedFromFrame) {
+                    // Set zoom highlight
+                    timelineItem.classList.add("frame-zoom");
                 }
             }
 
@@ -186,11 +193,12 @@ class Renderer {
         this.canvas.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
         this.canvasFullscreen.style.transform = `translate(${window.scrollX}px, ${window.scrollY}px)`;
 
-        // Clear values
-        this.renderer.setClearColor(0xffffff);
+        // Clear value fullscreen
+        this.renderer.setClearColor(0xfafafa);
         this.renderer.setScissorTest(false);
         this.renderer.clear();
     
+        // Clear value for each scene
         this.renderer.setClearColor(0xffffff);
         this.renderer.setScissorTest(true);
 
@@ -259,17 +267,14 @@ class Renderer {
                     let previousFrameElement = previousRowFrames.frameObjects[rowInfo.zoomedFromFrame - previousRowInfo.start].frameElement;
                     let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                    // Get information of the first frame in the zoomed row
-                    let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
+                    // Get rectangle of the timeline in the zoomed row
+                    let timelineRect = visibleFramesInRow.rowWrapper.rowTimeline.getBoundingClientRect();
                     // Draw left line
                     this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                        firstFrameRect.left, firstFrameRect.top);
-                    
-                    // Get information of the last frame in the zoomed row
-                    let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
+                        timelineRect.left, timelineRect.top);
                     // Draw left line
                     this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                        lastFrameRect.right, firstFrameRect.top);
+                        timelineRect.right, timelineRect.top);
                 } else {
                     // The frame is not visible -> Draw from the nearest point to the next row
 
@@ -278,33 +283,27 @@ class Renderer {
                         let previousFrameElement = previousRowFrames.frameObjects[0].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                        // Get information of the first frame in the zoomed row
-                        let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
+                        // Get rectangle of the timeline in the zoomed row
+                        let timelineRect = visibleFramesInRow.rowWrapper.rowTimeline.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                            firstFrameRect.left, firstFrameRect.top);
-                        
-                        // Get information of the last frame in the zoomed row
-                        let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
+                            timelineRect.left, timelineRect.top);
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                            lastFrameRect.right, firstFrameRect.top);
+                            timelineRect.right, timelineRect.top);
                     } else {
                         // Select the right-most frame
                         let previousFrameElement = previousRowFrames.frameObjects[previousRowFrames.frameObjects.length-1].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                        // Get information of the first frame in the zoomed row
-                        let firstFrameRect = visibleFramesInRow.frameObjects[0].frameElement.getBoundingClientRect();
+                        // Get rectangle of the timeline in the zoomed row
+                        let timelineRect = visibleFramesInRow.rowWrapper.rowTimeline.getBoundingClientRect();
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                            firstFrameRect.left, firstFrameRect.top);
-                        
-                        // Get information of the last frame in the zoomed row
-                        let lastFrameRect = visibleFramesInRow.frameObjects[visibleFramesInRow.frameObjects.length-1].frameElement.getBoundingClientRect();
+                            timelineRect.left, timelineRect.top);
                         // Draw left line
                         this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                            lastFrameRect.right, firstFrameRect.top);
+                            timelineRect.right, timelineRect.top);
                     }
                 }
         }

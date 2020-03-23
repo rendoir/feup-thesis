@@ -35,7 +35,7 @@ class Frame {
         let details = "";
 
         // Timestamps
-        details += "[" + this.initialTimestamp + ", " + this.finalTimestamp + "]" + "<br>";
+        details += "[" + this.initialTimestamp + ", " + this.finalTimestamp + "[" + "<br>";
         
         // Transformation-specific
         details += this.transformation.getOverlayDetails();
