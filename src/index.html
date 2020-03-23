@@ -18,13 +18,19 @@
         <script src="node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     </head>
     <body>
+        <!-- Canvases -->
         <canvas id="canvas"></canvas>
         <canvas id="canvas-fullscreen"></canvas>
 
-        <button id="test">TEST</button>
+        <!-- Header -->
+        <header>
+            <h1>Spatial-Temporal Data Visualization</h1>
+            <h4 id="dataset">Dataset: California</h4>
+            <i id="settings" type="button" class="btn-settings fas fa-cog" data-toggle="modal" data-target="#settings-modal"></i>
+        </header>
 
-		<div id="content">
-		</div>
+        <!-- Storyboard -->
+		<div id="content"></div>
 
         <!-- Frame template -->
         <template id="frame_template">
@@ -37,14 +43,35 @@
         <!-- Row template -->
         <template id="row_template">
             <div class="row-container">
+                <div class="timeline"></div>
                 <div class="storyboard-row">
                     <i type="button" class="btn-nav btn-nav-left fas fa-chevron-circle-left"></i>
                     <div class="row-frames"></div>
                     <i type="button" class="btn-nav btn-nav-right fas fa-chevron-circle-right"></i>
                 </div>
-                <div class="timeline"></div>
             </div>
         </template>
+
+        <!-- Settings Modal -->
+        <div class="modal fade" id="settings-modal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                <h5 class="modal-title">Settings</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                </div>
+                <div class="modal-body">
+                Modal body
+                </div>
+                <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Apply settings</button>
+                </div>
+            </div>
+            </div>
+        </div>
         
         <script src="dist/bundle.js"></script>
     </body>

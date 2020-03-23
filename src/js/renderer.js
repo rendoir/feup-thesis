@@ -13,8 +13,6 @@ class Renderer {
         this.renderer.setClearColor(0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
 
-        document.getElementById("test").addEventListener("click", this.rebuildScenes.bind(this));
-
         // Visible Frame Info is an array of objects
         // The index in the array is the depth
         // Each entry has the start frame (index in the storyboard row)

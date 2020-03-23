@@ -420,10 +420,6 @@ class Scale extends Transformation {
     }
 
     _getColor(i, nStates) {
-        //let h = (120.0 / 360.0) - (i / (nStates - 1)) * (120.0 / 360.0);
-        //let s = 1;
-        //let l = 0.5;
-
         let h = 0;
         let s = 1;
         let l = 1 - (0.2 + (i / (nStates - 1)) * 0.3);

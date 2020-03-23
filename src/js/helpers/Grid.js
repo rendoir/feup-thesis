@@ -4,6 +4,12 @@ const FONT_JSON = require('three/examples/fonts/helvetiker_regular.typeface.json
 var FONT = null;
 
 const SIZE_SCALE = 0.03;
+const TEXT_COLOR = 0x808080;
+
+let matLite = new THREE.MeshBasicMaterial( {
+    color: TEXT_COLOR,
+    side: THREE.DoubleSide
+} );
 
 class Grid extends THREE.Object3D {
     constructor(size, divisions, center) {
@@ -15,14 +21,7 @@ class Grid extends THREE.Object3D {
         // Text
         if( FONT == null )
             FONT = new THREE.Font( FONT_JSON );
-    
-        let textColor = 0x006699;
-
-        let matLite = new THREE.MeshBasicMaterial( {
-            color: textColor,
-            side: THREE.DoubleSide
-        } );
-        
+     
         let step = size / divisions;
         let halfSize = size / 2;
     
