@@ -1,6 +1,8 @@
 const THREE = require('three');
 const RowWrapper = require('./row');
 
+const FRAME_WIDTH = 256;
+
 class Renderer {
     constructor() {
         // Init canvas and renderer
@@ -10,6 +12,8 @@ class Renderer {
         this.renderer = new THREE.WebGLRenderer({ canvas: this.canvas, antialias: true });
         this.renderer.setClearColor(0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
+
+        document.getElementById("test").addEventListener("click", this.rebuildScenes.bind(this));
 
         // Visible Frame Info is an array of objects
         // The index in the array is the depth
@@ -136,6 +140,7 @@ class Renderer {
         frame.frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
         frame.overlayElement = frame.frameElement.getElementsByClassName("overlay")[0];
         frame.descriptionElement = frame.frameElement.getElementsByClassName("description")[0];
+        frame.sceneElement = frame.frameElement.getElementsByClassName("scene")[0];
         
         frame.overlayElement.innerHTML = frame.getOverlayDetails();
         frame.descriptionElement.innerHTML = frame.transformation.getName();
@@ -145,9 +150,6 @@ class Renderer {
         this.controller.setFrameDetailEvents(frame.frameElement);
         frame.frameElement.setAttribute("data-frame-id", frameIndex);
         rowWrapper.rowFramesElement.appendChild(frame.frameElement);
-
-        // Save the scene element in the scene object and append the element
-        frame.scene.userData.element = frame.frameElement.getElementsByClassName("scene")[0];
     }
 
     initTimelineItem(frame, rowWrapper, frameId, rowDuration) {
@@ -162,6 +164,12 @@ class Renderer {
         this.controller.setTimelineItemEvent(timelineItem);
 
         return timelineItem;
+    }
+
+    rebuildScenes() {
+        this.storyboard.traverseFrames((frame) => {
+            frame.setupScene();
+        });
     }
 
     renderLoop() {
@@ -207,8 +215,8 @@ class Renderer {
 
             // Render scenes
             for (let j = 0; j < visibleFramesInRow.frameObjects.length; j++) {
-                const scene = visibleFramesInRow.frameObjects[j].scene;
-                this.renderScene(scene);
+                const frame = visibleFramesInRow.frameObjects[j];
+                this.renderScene(frame);
             }
 
             // Render dashed lines
@@ -216,9 +224,9 @@ class Renderer {
         }
     }
 
-    renderScene(scene) {
+    renderScene(frame) {
         // Get the position of the scene element relative to the page's viewport
-        let rect = scene.userData.element.getBoundingClientRect();
+        let rect = frame.sceneElement.getBoundingClientRect();
 
         // Check if it's offscreen. If so skip it.
         if (rect.bottom < 0 || rect.top > this.renderer.domElement.clientHeight ||
@@ -235,8 +243,8 @@ class Renderer {
         this.renderer.setViewport(left, bottom, width, height);
         this.renderer.setScissor(left, bottom, width, height);
 
-        let camera = scene.userData.camera;
-        this.renderer.render(scene, camera);
+        let camera = frame.scene.userData.camera;
+        this.renderer.render(frame.scene, camera);
     }
 
     renderDashedLines(i, rowInfo, visibleFramesInRow) {
@@ -320,7 +328,7 @@ class Renderer {
             this.canvasFullscreen.width = width;
             this.canvasFullscreen.height = height;
             this.renderer.setSize(width, height, false);
-            let newMaxFramesPerPage = Math.max(Math.floor(width / 200) - 1, 1); // Each frame has 200 pixels
+            let newMaxFramesPerPage = Math.max(Math.floor(width / FRAME_WIDTH) - 1, 1);
             if (newMaxFramesPerPage !== this.maxFramesPerPage) {
                 this.maxFramesPerPage = newMaxFramesPerPage;
                 this.needsUpdate = true;

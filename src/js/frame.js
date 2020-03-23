@@ -19,6 +19,7 @@ class Frame {
         this.frameElement = null;
         this.descriptionElement = null;
         this.overlayElement = null;
+        this.sceneElement = null;
 
         this.setupScene();
     }

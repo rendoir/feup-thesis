@@ -53,7 +53,6 @@ class Grid extends THREE.Object3D {
 
 
     drawText(x, y, mat, xAxis) {
-        // TODO: SHAPE CACHE
         let wx = x + this.center.x;
         let wy = y + this.center.y;
 
