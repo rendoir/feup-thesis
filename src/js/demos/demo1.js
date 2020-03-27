@@ -75,8 +75,8 @@ vertices.forEach(vertex => {
 let verticesOrientation2 = [];
 verticesOrientation1.forEach(vertex => {
     let newVertex = new THREE.Vector2(vertex.x, vertex.y);
-    //newVertex.add(new THREE.Vector2(100, 200));
     newVertex.rotateAround(centroid, THREE.MathUtils.degToRad(60));
+    //newVertex.add(new THREE.Vector2(100, 200));
     verticesOrientation2.push(newVertex);
 });
 
@@ -90,7 +90,7 @@ objectOrientation.setStates(statesOrientation);
 let orientation = new Orientation(THREE.MathUtils.degToRad(80));
 
 
-/* ----- Rotation ----- */
+/* ----- ROTATION ----- */
 let objectRotation = new Object();
 let pivot = new THREE.Vector2(100, 100);
 

@@ -1,6 +1,6 @@
 const THREE = require('three');
 const CurvedArrow = require('./helpers/CurvedArrow');
-const EllipseArc = require('./helpers/EllipseArc');
+const Arc = require('./helpers/Arc');
 const Grid = require('./helpers/Grid');
 
 const ARROW_DEPTH = 250;
@@ -282,15 +282,18 @@ class Orientation extends Transformation {
             initialState.boundingBox.getCenter(initialStateCenter);
             let finalStateCenter = new THREE.Vector3(); 
             finalState.boundingBox.getCenter(finalStateCenter);
-            let center = new THREE.Vector2((initialStateCenter.x + finalStateCenter.x)/2, (initialStateCenter.y + finalStateCenter.y)/2);
+            let center = new THREE.Vector3().lerpVectors(initialStateCenter, finalStateCenter, 0.5);
 
             // Get bounding box size
             let sceneScale = this.getMaxSceneBoxSize();
 
             // Loop all vertices
-            for (let i = 0; i < initialState.vertices.length; i++) {                
-                let ellipseArc = new EllipseArc(center, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH, this.orientationAngle);
-                this.scene.add( ellipseArc );
+            for (let i = 0; i < initialState.vertices.length; i++) {   
+                let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
+                let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);       
+
+                let arc = new Arc(center, start, end, sceneScale, MAPPING_DEPTH);
+                this.scene.add( arc );
             }
         }
     }
@@ -364,10 +367,15 @@ class Rotation extends Transformation {
             // Get bounding box size
             let sceneScale = this.getMaxSceneBoxSize();
 
+            let center = new THREE.Vector3(this.pivot.x, this.pivot.y, 0);
+
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
-                let ellipseArc = new EllipseArc(this.pivot, initialState.vertices[i], finalState.vertices[i], sceneScale, MAPPING_DEPTH, this.rotationAngle);
-                this.scene.add( ellipseArc );
+                let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
+                let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);
+
+                let arc = new Arc(center, start, end, sceneScale, MAPPING_DEPTH);
+                this.scene.add( arc );
             }
         }
     }

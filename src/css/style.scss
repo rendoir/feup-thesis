@@ -88,6 +88,7 @@ canvas {
         border: $default-border;
         border-right: none;
         background-color: $timeline-invisible-color;
+        vertical-align: middle;
     }
     
     .frame-visible {
