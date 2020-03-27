@@ -115,6 +115,9 @@ class Renderer {
                 }
             }
 
+            // Init timeline
+            this.initTimeline(visibleFramesInRow);
+
             // Add to visible frames
             this.visibleFrames.push(visibleFramesInRow);
             
@@ -130,6 +133,7 @@ class Renderer {
         rowWrapper.rowContainer = this.rowTemplate.content.cloneNode(true).firstElementChild;
         rowWrapper.rowElement = rowWrapper.rowContainer.getElementsByClassName("storyboard-row")[0];
         rowWrapper.rowFrameTimeline = rowWrapper.rowContainer.getElementsByClassName("frame-timeline")[0];
+        rowWrapper.rowTimeline = rowWrapper.rowContainer.getElementsByClassName("timeline")[0];
         rowWrapper.rowFramesElement = rowWrapper.rowElement.getElementsByClassName('row-frames')[0];
 
         rowWrapper.rowElement.setAttribute("data-row-id", infoIndex);
@@ -169,6 +173,20 @@ class Renderer {
         this.controller.setFrameTimelineItemEvent(frameTimelineItem);
 
         return frameTimelineItem;
+    }
+
+    initTimeline(visibleFramesInRow) {
+        let nrDivisions = 10; // TODO
+        for(let i = 0; i < nrDivisions + 1; i++) {
+            let timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+            timelineItem.style.width = 100.0 / nrDivisions + "%";
+            visibleFramesInRow.rowWrapper.rowTimeline.appendChild(timelineItem);
+            
+            let itemLabel = document.createElement("span");
+            itemLabel.innerHTML = "Text"; // TODO
+            timelineItem.appendChild(itemLabel);
+        }
     }
 
     rebuildScenes() {
@@ -218,6 +236,11 @@ class Renderer {
             visibleFramesInRow.rowWrapper.rowFrameTimeline.style.width = rowFramesRect.width + "px";
             visibleFramesInRow.rowWrapper.rowFrameTimeline.style.marginLeft = rowFramesRect.x + "px";
             visibleFramesInRow.rowWrapper.rowFrameTimeline.style.transform = `translateX(${window.scrollX}px)`;
+
+            // Adjust timeline
+            visibleFramesInRow.rowWrapper.rowTimeline.style.width = rowFramesRect.width + "px";
+            visibleFramesInRow.rowWrapper.rowTimeline.style.marginLeft = rowFramesRect.x + "px";
+            visibleFramesInRow.rowWrapper.rowTimeline.style.transform = `translateX(${window.scrollX}px)`;
 
             // Render scenes
             for (let j = 0; j < visibleFramesInRow.frameObjects.length; j++) {

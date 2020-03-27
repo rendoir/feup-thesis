@@ -38,6 +38,7 @@ canvas {
     z-index: 1;
 }
 
+/* Storyboard */
 .storyboard-frame {
     position: relative;
     display: inline-block;
@@ -78,17 +79,22 @@ canvas {
     }
 }
 
+.row-container {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Timelines */
 .frame-timeline {
     height: 25px;
-    margin-bottom: 8px;
 
     .frame-timeline-item {
         display: inline-block;
         height: 100%;
+        vertical-align: top;
         border: $default-border;
         border-right: none;
         background-color: $timeline-invisible-color;
-        vertical-align: middle;
     }
     
     .frame-visible {
@@ -108,9 +114,32 @@ canvas {
     }
 }
 
-.row-container {
-    display: flex;
-    flex-direction: column;
+.timeline {
+    height: 10px;
+    margin-bottom: 2em;
+
+    .timeline-item {
+        display: inline-block;
+        height: 100%;
+        vertical-align: top;
+        border-left: $default-border;
+        background-color: rgba(0, 0, 0, 0);
+
+        span {
+            display: inline-block;
+            transform: translate(-50%, 25%);
+            font-size: 0.8em;
+        }
+    }
+
+    div:nth-last-child(2).timeline-item {
+        border-right: $default-border;
+    }
+
+    div:last-child.timeline-item {
+        border: none;
+        width: 0 !important;
+    }
 }
 
 /* Buttons */
