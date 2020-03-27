@@ -445,7 +445,7 @@ class Immutability extends Transformation {
 
     getDetails() { return "The object had no substantial transformations" }
 
-    getOverlayDetails() { return "" }
+    getOverlayDetails() { return "No changes" }
     
     setupScene(scene, object) { 
         super.setupScene(scene, object);
@@ -474,7 +474,7 @@ class Unknown extends Transformation {
 
     getDetails() { return "The object suffered an unknown transformation" }
 
-    getOverlayDetails() { return "" }
+    getOverlayDetails() { return "Unknown changes" }
     
     setupScene(scene, object) { 
         super.setupScene(scene, object);

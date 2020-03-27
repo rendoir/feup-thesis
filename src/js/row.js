@@ -5,7 +5,7 @@ class RowWrapper {
     constructor() {
         this.rowContainer = null;
         this.rowElement = null;
-        this.rowTimeline = null;
+        this.rowFrameTimeline = null;
         this.rowFramesElement = null;
     }
 }

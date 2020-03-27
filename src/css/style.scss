@@ -78,11 +78,11 @@ canvas {
     }
 }
 
-.timeline {
+.frame-timeline {
     height: 25px;
     margin-bottom: 8px;
 
-    .timeline-item {
+    .frame-timeline-item {
         display: inline-block;
         height: 100%;
         border: $default-border;
@@ -103,7 +103,7 @@ canvas {
         background-color: $timeline-zoom-visible-color;
     }
 
-    div:last-child.timeline-item {
+    div:last-child.frame-timeline-item {
         border-right: $default-border;
     }
 }

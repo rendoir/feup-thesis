@@ -93,14 +93,14 @@ class Controller {
         }
     }
 
-    setTimelineItemEvent(item) {
-        item.onclick = this.onTimelineItemClick.bind(this);
+    setFrameTimelineItemEvent(item) {
+        item.onclick = this.onFrameTimelineItemClick.bind(this);
     }
 
-    onTimelineItemClick(event) {
+    onFrameTimelineItemClick(event) {
         // Get frame and row
         let frameId = parseInt(event.target.getAttribute("data-frame-id"));
-        let row = event.target.closest(".timeline");
+        let row = event.target.closest(".frame-timeline");
         let rowId = parseInt(row.getAttribute("data-row-id"));
         //console.log(`Row: ${rowId} | Frame: ${frameId}`);
 
