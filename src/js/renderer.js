@@ -1,5 +1,6 @@
 const THREE = require('three');
 const RowWrapper = require('./row');
+const Utils = require('./utils');
 
 const FRAME_WIDTH = 256;
 
@@ -116,7 +117,7 @@ class Renderer {
             }
 
             // Init timeline
-            this.initTimeline(visibleFramesInRow);
+            this.initTimeline(visibleFramesInRow.rowWrapper, row);
 
             // Add to visible frames
             this.visibleFrames.push(visibleFramesInRow);
@@ -175,18 +176,37 @@ class Renderer {
         return frameTimelineItem;
     }
 
-    initTimeline(visibleFramesInRow) {
-        let nrDivisions = 10; // TODO
-        for(let i = 0; i < nrDivisions + 1; i++) {
-            let timelineItem = document.createElement("div");
-            timelineItem.classList.add("timeline-item");
-            timelineItem.style.width = 100.0 / nrDivisions + "%";
-            visibleFramesInRow.rowWrapper.rowTimeline.appendChild(timelineItem);
-            
-            let itemLabel = document.createElement("span");
-            itemLabel.innerHTML = "Text"; // TODO
-            timelineItem.appendChild(itemLabel);
+    initTimeline(rowWrapper, row) {
+        let rowTimeline = rowWrapper.rowTimeline;
+        let fullWidth = rowWrapper.rowFramesElement.getBoundingClientRect().width;
+        let nrDivisions = Math.max(Math.floor(fullWidth / 100), 1);
+
+        let width = 100.0 / nrDivisions + "%";
+
+        let firstFrame = row[0];
+        let lastFrame = row[row.length-1];
+        
+        // First div
+        this.initTimelineItem(rowTimeline, width, Utils.getDateString(new Date(firstFrame.initialTimestamp)));
+
+        for(let i = 0; i < nrDivisions - 1; i++) {
+            let text = i;
+            this.initTimelineItem(rowTimeline, width, text)
         }
+
+        // Last div
+        this.initTimelineItem(rowTimeline, 0, Utils.getDateString(new Date(lastFrame.finalTimestamp)));
+    }
+
+    initTimelineItem(rowTimeline, width, text) {
+        let timelineItem = document.createElement("div");
+        timelineItem.classList.add("timeline-item");
+        timelineItem.style.width = width;
+        rowTimeline.appendChild(timelineItem);
+        
+        let itemLabel = document.createElement("span");
+        itemLabel.innerHTML = text;
+        timelineItem.appendChild(itemLabel);
     }
 
     rebuildScenes() {

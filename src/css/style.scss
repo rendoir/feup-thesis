@@ -116,7 +116,7 @@ canvas {
 
 .timeline {
     height: 10px;
-    margin-bottom: 2em;
+    margin-bottom: 3em; // Allow space for text
 
     .timeline-item {
         display: inline-block;
@@ -127,8 +127,9 @@ canvas {
 
         span {
             display: inline-block;
-            transform: translate(-50%, 25%);
+            transform: translate(-50%, 25%) /*rotate(-45deg)*/;
             font-size: 0.8em;
+            text-align: center;
         }
     }
 

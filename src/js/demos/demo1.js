@@ -3,7 +3,7 @@ const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('../transformation');
 
-let timestamp = 0;
+let timestamp = Date.now();
 
 /* ----- OBJECT ----- */
 let vertices = [];
@@ -244,7 +244,8 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 
 function stepTime() {
-    timestamp += Math.ceil(Math.random() * 1000 + 10);
+    // Step half a day to 4 days
+    timestamp += Math.ceil(Math.random() * (8.64e+7)*4 + (8.64e+7)/2);
     return timestamp;
 }
 
