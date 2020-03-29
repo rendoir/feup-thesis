@@ -178,24 +178,38 @@ class Renderer {
 
     initTimeline(rowWrapper, row) {
         let rowTimeline = rowWrapper.rowTimeline;
-        let fullWidth = rowWrapper.rowFramesElement.getBoundingClientRect().width;
-        let nrDivisions = Math.max(Math.floor(fullWidth / 100), 1);
-
-        let width = 100.0 / nrDivisions + "%";
+        //let fullWidth = rowWrapper.rowFramesElement.getBoundingClientRect().width;
+        //let nrDivisions = Math.max(Math.floor(fullWidth / 100), 3);
 
         let firstFrame = row[0];
         let lastFrame = row[row.length-1];
-        
-        // First div
-        this.initTimelineItem(rowTimeline, width, Utils.getDateString(new Date(firstFrame.initialTimestamp)));
+        let firstDate = new Date(firstFrame.initialTimestamp);
+        let lastDate = new Date(lastFrame.finalTimestamp);
 
-        for(let i = 0; i < nrDivisions - 1; i++) {
-            let text = i;
-            this.initTimelineItem(rowTimeline, width, text)
+        let unit = Utils.getUnit(firstFrame.initialTimestamp, lastFrame.finalTimestamp);
+        let nrDivisions = Utils.getNumberUnits(unit, firstFrame.initialTimestamp, lastFrame.finalTimestamp);
+
+        let width = 100.0 / nrDivisions + "%";
+        
+        // First div - Initial time
+        this.initTimelineItem(rowTimeline, width, Utils.getDateString(firstDate));
+
+        // Second div - Next time closest to unit
+        let secondTime = Utils.getNextTimeByUnit(unit, firstFrame.initialTimestamp);
+        this.initTimelineItem(rowTimeline, width, secondTime.value);
+
+        let lastTime = secondTime;
+        for(let i = 0; i < nrDivisions - 3; i++) {
+            lastTime = Utils.getNextTimeByUnit(unit, lastTime.timestamp);
+            this.initTimelineItem(rowTimeline, width, lastTime.value);
         }
 
-        // Last div
-        this.initTimelineItem(rowTimeline, 0, Utils.getDateString(new Date(lastFrame.finalTimestamp)));
+        // Penultimate div - Previous time closest to unit
+        let penultimateTime = Utils.getPreviousTimeByUnit(unit, lastFrame.finalTimestamp);
+        this.initTimelineItem(rowTimeline, width, penultimateTime.value);
+
+        // Last div - Final time
+        this.initTimelineItem(rowTimeline, 0, Utils.getDateString(lastDate));
     }
 
     initTimelineItem(rowTimeline, width, text) {
