@@ -117,6 +117,7 @@ canvas {
 .timeline {
     height: 10px;
     margin-bottom: 3em; // Allow space for text
+    display: flex;
 
     .timeline-item {
         display: inline-block;
@@ -132,6 +133,10 @@ canvas {
             text-align: center;
             white-space: pre;
         }
+    }
+
+    div:nth-child(2).timeline-item span, div:nth-last-child(2).timeline-item span {
+        display: none; // Hide because it would overlap with the first/last date label
     }
 
     div:nth-last-child(2).timeline-item {

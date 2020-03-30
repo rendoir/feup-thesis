@@ -12,10 +12,10 @@ function getUnit(initialTimestamp, finalTimestamp) {
 }
 
 function getNumberUnits(unit, initialTimestamp, finalTimestamp) {
-    let difference = finalTimestamp - initialTimestamp;
+    let difference = getFloorTimeByUnit(unit, finalTimestamp) - getFloorTimeByUnit(unit, initialTimestamp);
     switch (unit) {
         case Unit.DAYS:
-            return Math.floor(difference / Milliseconds.DAY); 
+            return Math.round(difference / Milliseconds.DAY);
     
         default:
             return null;
@@ -55,13 +55,33 @@ function getPreviousTimeByUnit(unit, timestamp) {
     return getTimeByUnit(unit, timestamp, sub);
 }
 
+function getCurrentTimeByUnit(unit, timestamp) {
+    return getTimeByUnit(unit, timestamp, noOp);
+}
+
+function getFloorTimeByUnit(unit, timestamp) {
+    let date = new Date(timestamp);
+    switch (unit) {
+        case Unit.DAYS:
+            date.setHours(0,0,0,0);
+            break;
+    
+        default:
+            break;
+    }
+    return date.getTime();
+}
+
 function sum(a,b) { return a + b; }
 function sub(a,b) { return a - b; }
+function noOp(a,b) { return a; }
 
 module.exports = {
     getDateString : getDateString,
     getUnit : getUnit,
     getNextTimeByUnit : getNextTimeByUnit,
     getPreviousTimeByUnit : getPreviousTimeByUnit,
-    getNumberUnits : getNumberUnits
+    getCurrentTimeByUnit : getCurrentTimeByUnit,
+    getNumberUnits : getNumberUnits,
+    getFloorTimeByUnit : getFloorTimeByUnit
 }

@@ -189,24 +189,27 @@ class Renderer {
         let unit = Utils.getUnit(firstFrame.initialTimestamp, lastFrame.finalTimestamp);
         let nrDivisions = Utils.getNumberUnits(unit, firstFrame.initialTimestamp, lastFrame.finalTimestamp);
 
-        let width = 100.0 / nrDivisions + "%";
+        let secondTime = Utils.getNextTimeByUnit(unit, Utils.getFloorTimeByUnit(unit, firstFrame.initialTimestamp));
+        let firstWidth = (secondTime.timestamp - firstFrame.initialTimestamp) * 100 / (lastFrame.finalTimestamp - firstFrame.initialTimestamp);
+        let penultimateTime = Utils.getCurrentTimeByUnit(unit, Utils.getFloorTimeByUnit(unit, lastFrame.finalTimestamp));
+        let lastWidth = (lastFrame.finalTimestamp - penultimateTime.timestamp) * 100 / (lastFrame.finalTimestamp - firstFrame.initialTimestamp);
         
+        let width = (100.0-firstWidth-lastWidth) / (nrDivisions-1) + "%";
+
         // First div - Initial time
-        this.initTimelineItem(rowTimeline, width, Utils.getDateString(firstDate));
+        this.initTimelineItem(rowTimeline, firstWidth + "%", Utils.getDateString(firstDate));
 
         // Second div - Next time closest to unit
-        let secondTime = Utils.getNextTimeByUnit(unit, firstFrame.initialTimestamp);
         this.initTimelineItem(rowTimeline, width, secondTime.value);
 
         let lastTime = secondTime;
-        for(let i = 0; i < nrDivisions - 3; i++) {
+        for(let i = 0; i < nrDivisions - 2; i++) {
             lastTime = Utils.getNextTimeByUnit(unit, lastTime.timestamp);
             this.initTimelineItem(rowTimeline, width, lastTime.value);
         }
 
         // Penultimate div - Previous time closest to unit
-        let penultimateTime = Utils.getPreviousTimeByUnit(unit, lastFrame.finalTimestamp);
-        this.initTimelineItem(rowTimeline, width, penultimateTime.value);
+        this.initTimelineItem(rowTimeline, lastWidth + "%", penultimateTime.value);
 
         // Last div - Final time
         this.initTimelineItem(rowTimeline, 0, Utils.getDateString(lastDate));
