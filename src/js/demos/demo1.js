@@ -245,16 +245,25 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 
 function stepTime() {
-    // Step a few hours -> results in hours
-    timestamp += Math.ceil(Math.random() * Utils.Milliseconds.HOUR*3 + Utils.Milliseconds.HOUR/2);
+    // Step a few milliseconds
+    timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*10 + Utils.Milliseconds.MILLISECOND);
 
-    // Step a few days -> results in days
+    // Step a few seconds
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.SECOND*5 + Utils.Milliseconds.SECOND/2);
+
+    // Step a few minutes
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MINUTE*5 + Utils.Milliseconds.MINUTE/2);
+
+    // Step a few hours
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.HOUR*3 + Utils.Milliseconds.HOUR/2);
+
+    // Step a few days
     //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.DAY*5 + Utils.Milliseconds.DAY/2);
 
-    // Step a few months -> results in months
+    // Step a few months
     //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MONTH*3 + Utils.Milliseconds.MONTH/2);
 
-    // Step a few years -> results in years
+    // Step a few years
     //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.YEAR*5 + Utils.Milliseconds.YEAR/2);
 
     return timestamp;

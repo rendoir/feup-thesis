@@ -1,4 +1,7 @@
 const Milliseconds = Object.freeze({
+    MILLISECOND: 1,
+    SECOND: 1000,
+    MINUTE: 1000 * 60,
     HOUR: 1000 * 60 * 60,
     DAY: 1000 * 60 * 60 * 24,
     MONTH: 1000 * 60 * 60 * 24 * 31,
@@ -6,16 +9,31 @@ const Milliseconds = Object.freeze({
 });
 
 const Unit = Object.freeze({
-    HOUR:  1,
-    DAYS:  2,
-    MONTH: 3,
-    YEAR:  4
+    MILLISECOND: 1,
+    SECOND:      2,
+    MINUTE:      3,
+    HOUR:        4,
+    DAYS:        5,
+    MONTH:       6,
+    YEAR:        7
 });
 
 const MonthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function getUnit(initialTimestamp, finalTimestamp) {
     let difference = finalTimestamp - initialTimestamp;
+
+    // Less than 2 seconds
+    if ( difference < 2 * Milliseconds.SECOND )
+        return Unit.MILLISECOND;
+
+    // Less than 2 minutes
+    if ( difference < 2 * Milliseconds.MINUTE )
+        return Unit.SECOND;
+
+    // Less than 2 hours
+    if ( difference < 2 * Milliseconds.HOUR )
+        return Unit.MINUTE;
 
     // Less than 2 days
     if ( difference < 2 * Milliseconds.DAY )
@@ -37,6 +55,15 @@ function getNumberUnits(unit, initialTimestamp, finalTimestamp) {
     let difference = getFloorTimeByUnit(unit, finalTimestamp) - getFloorTimeByUnit(unit, initialTimestamp);
     
     switch (unit) {
+        case Unit.MILLISECOND:
+            return Math.round(difference / Milliseconds.MILLISECOND);
+
+        case Unit.SECOND:
+            return Math.round(difference / Milliseconds.SECOND);
+
+        case Unit.MINUTE:
+            return Math.round(difference / Milliseconds.MINUTE);
+
         case Unit.HOUR:
             return Math.round(difference / Milliseconds.HOUR);
 
@@ -68,6 +95,21 @@ function getDateString(date) {
 function getTimeByUnit(unit, timestamp, op) {
     let time = {};
     switch (unit) {
+        case Unit.MILLISECOND:
+            time.timestamp = op(timestamp, Milliseconds.MILLISECOND);
+            time.value = new Date(time.timestamp).getMilliseconds() + "ms";
+            break;
+
+        case Unit.SECOND:
+            time.timestamp = op(timestamp, Milliseconds.SECOND);
+            time.value = new Date(time.timestamp).getSeconds() + "s";
+            break;
+
+        case Unit.MINUTE:
+            time.timestamp = op(timestamp, Milliseconds.MINUTE);
+            time.value = new Date(time.timestamp).getMinutes() + "m";
+            break;
+
         case Unit.HOUR:
             time.timestamp = op(timestamp, Milliseconds.HOUR);
             time.value = new Date(time.timestamp).getHours() + "h";
@@ -109,6 +151,17 @@ function getCurrentTimeByUnit(unit, timestamp) {
 function getFloorTimeByUnit(unit, timestamp) {
     let date = new Date(timestamp);
     switch (unit) {
+        case Unit.MILLISECOND:
+            break;
+
+        case Unit.SECOND:
+            date.setHours(date.getHours(), date.getMinutes(), date.getSeconds(),0);
+            break;
+
+        case Unit.MINUTE:
+            date.setHours(date.getHours(), date.getMinutes(),0,0);
+            break;
+
         case Unit.HOUR:
             date.setHours(date.getHours(),0,0,0);
             break;
