@@ -1,4 +1,5 @@
 const THREE = require('three');
+const Utils = require('../utils');
 const Frame = require('../frame');
 const { Object, ObjectState } = require('../object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('../transformation');
@@ -244,8 +245,18 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 
 function stepTime() {
-    // Step half a day to 4 days
-    timestamp += Math.ceil(Math.random() * (8.64e+7)*20 + (8.64e+7)/2);
+    // Step a few hours -> results in hours
+    timestamp += Math.ceil(Math.random() * Utils.Milliseconds.HOUR*3 + Utils.Milliseconds.HOUR/2);
+
+    // Step a few days -> results in days
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.DAY*5 + Utils.Milliseconds.DAY/2);
+
+    // Step a few months -> results in months
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MONTH*3 + Utils.Milliseconds.MONTH/2);
+
+    // Step a few years -> results in years
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.YEAR*5 + Utils.Milliseconds.YEAR/2);
+
     return timestamp;
 }
 

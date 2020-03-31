@@ -188,7 +188,6 @@ class Renderer {
 
         let unit = Utils.getUnit(firstFrame.initialTimestamp, lastFrame.finalTimestamp);
         let nrDivisions = Utils.getNumberUnits(unit, firstFrame.initialTimestamp, lastFrame.finalTimestamp);
-        //console.log("nr units: ", nrDivisions);
 
         let secondTime = Utils.getNextTimeByUnit(unit, Utils.getFloorTimeByUnit(unit, firstFrame.initialTimestamp));
         let firstWidth = (secondTime.timestamp - firstFrame.initialTimestamp) * 100 / (lastFrame.finalTimestamp - firstFrame.initialTimestamp);
