@@ -129,7 +129,7 @@ canvas {
         span {
             display: inline-block;
             transform: translate(-50%, 25%) /*rotate(-45deg)*/;
-            font-size: 0.8em;
+            font-size: 0.65em;
             text-align: center;
             white-space: pre;
         }
@@ -139,13 +139,22 @@ canvas {
         display: none; // Hide because it would overlap with the first/last date label
     }
 
-    div:nth-last-child(2).timeline-item {
-        border-right: $default-border;
+    div:first-child.timeline-item {
+        height: 20px;
     }
 
     div:last-child.timeline-item {
         border: none;
+        border-right: $default-border;
         width: 0 !important;
+        height: 20px;
+    }
+
+    div:first-child.timeline-item, div:last-child.timeline-item {
+        span {
+            transform: translate(-50%, 60%) /*rotate(-45deg)*/;
+            font-size: 0.7em;
+        }
     }
 }
 

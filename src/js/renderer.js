@@ -178,8 +178,8 @@ class Renderer {
 
     initTimeline(rowWrapper, row) {
         let rowTimeline = rowWrapper.rowTimeline;
-        //let fullWidth = rowWrapper.rowFramesElement.getBoundingClientRect().width;
-        //let nrDivisions = Math.max(Math.floor(fullWidth / 100), 3);
+        let fullWidth = rowWrapper.rowFramesElement.getBoundingClientRect().width;
+        let minWidth = 30; // Minimum width to display a number
 
         let firstFrame = row[0];
         let lastFrame = row[row.length-1];
@@ -188,13 +188,16 @@ class Renderer {
 
         let unit = Utils.getUnit(firstFrame.initialTimestamp, lastFrame.finalTimestamp);
         let nrDivisions = Utils.getNumberUnits(unit, firstFrame.initialTimestamp, lastFrame.finalTimestamp);
+        //console.log("nr units: ", nrDivisions);
 
         let secondTime = Utils.getNextTimeByUnit(unit, Utils.getFloorTimeByUnit(unit, firstFrame.initialTimestamp));
         let firstWidth = (secondTime.timestamp - firstFrame.initialTimestamp) * 100 / (lastFrame.finalTimestamp - firstFrame.initialTimestamp);
         let penultimateTime = Utils.getCurrentTimeByUnit(unit, Utils.getFloorTimeByUnit(unit, lastFrame.finalTimestamp));
         let lastWidth = (lastFrame.finalTimestamp - penultimateTime.timestamp) * 100 / (lastFrame.finalTimestamp - firstFrame.initialTimestamp);
         
-        let width = (100.0-firstWidth-lastWidth) / (nrDivisions-1) + "%";
+        let width = (100.0-firstWidth-lastWidth) / (nrDivisions-1);
+        let widthInPixels = fullWidth * width / 100;
+        width += "%";
 
         // First div - Initial time
         this.initTimelineItem(rowTimeline, firstWidth + "%", Utils.getDateString(firstDate));
@@ -202,10 +205,17 @@ class Renderer {
         // Second div - Next time closest to unit
         this.initTimelineItem(rowTimeline, width, secondTime.value);
 
+        let widthAccumulator = minWidth;
         let lastTime = secondTime;
         for(let i = 0; i < nrDivisions - 2; i++) {
             lastTime = Utils.getNextTimeByUnit(unit, lastTime.timestamp);
-            this.initTimelineItem(rowTimeline, width, lastTime.value);
+            let shouldHide = true;
+            if (widthAccumulator >= minWidth) {
+                shouldHide = false;
+                widthAccumulator = 0;
+            }
+            this.initTimelineItem(rowTimeline, width, lastTime.value, shouldHide);
+            widthAccumulator += widthInPixels;
         }
 
         // Penultimate div - Previous time closest to unit
@@ -215,7 +225,7 @@ class Renderer {
         this.initTimelineItem(rowTimeline, 0, Utils.getDateString(lastDate));
     }
 
-    initTimelineItem(rowTimeline, width, text) {
+    initTimelineItem(rowTimeline, width, text, shouldHide) {
         let timelineItem = document.createElement("div");
         timelineItem.classList.add("timeline-item");
         timelineItem.style.width = width;
@@ -224,6 +234,11 @@ class Renderer {
         let itemLabel = document.createElement("span");
         itemLabel.innerHTML = text;
         timelineItem.appendChild(itemLabel);
+
+        if (shouldHide)
+            itemLabel.style.display = 'none';
+
+        return this.initTimelineItem;
     }
 
     rebuildScenes() {

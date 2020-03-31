@@ -245,7 +245,7 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 function stepTime() {
     // Step half a day to 4 days
-    timestamp += Math.ceil(Math.random() * (8.64e+7)*4 + (8.64e+7)/2);
+    timestamp += Math.ceil(Math.random() * (8.64e+7)*20 + (8.64e+7)/2);
     return timestamp;
 }
 
