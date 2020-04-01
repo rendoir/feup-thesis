@@ -246,7 +246,13 @@ let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());
 
 function stepTime() {
     // Step a few milliseconds
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*10 + Utils.Milliseconds.MILLISECOND);
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*2 + Utils.Milliseconds.MILLISECOND);
+
+    // Step a few deciseconds
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*20 + Utils.Milliseconds.MILLISECOND);
+
+    // Step a few centiseconds
+    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*200 + Utils.Milliseconds.MILLISECOND*10);
 
     // Step a few seconds
     //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.SECOND*5 + Utils.Milliseconds.SECOND/2);

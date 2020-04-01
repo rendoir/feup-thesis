@@ -1,21 +1,25 @@
 const Milliseconds = Object.freeze({
     MILLISECOND: 1,
-    SECOND: 1000,
-    MINUTE: 1000 * 60,
-    HOUR: 1000 * 60 * 60,
-    DAY: 1000 * 60 * 60 * 24,
-    MONTH: 1000 * 60 * 60 * 24 * 31,
-    YEAR: 1000 * 60 * 60 * 24 * 366
+    CENTISECOND: 10,
+    DECISECOND:  100,
+    SECOND:      1000,
+    MINUTE:      1000 * 60,
+    HOUR:        1000 * 60 * 60,
+    DAY:         1000 * 60 * 60 * 24,
+    MONTH:       1000 * 60 * 60 * 24 * 31,
+    YEAR:        1000 * 60 * 60 * 24 * 366
 });
 
 const Unit = Object.freeze({
     MILLISECOND: 1,
-    SECOND:      2,
-    MINUTE:      3,
-    HOUR:        4,
-    DAYS:        5,
-    MONTH:       6,
-    YEAR:        7
+    CENTISECOND: 2,
+    DECISECOND:  3,
+    SECOND:      4,
+    MINUTE:      5,
+    HOUR:        6,
+    DAYS:        7,
+    MONTH:       8,
+    YEAR:        9
 });
 
 const MonthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -23,9 +27,17 @@ const MonthNamesShort = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug',
 function getUnit(initialTimestamp, finalTimestamp) {
     let difference = finalTimestamp - initialTimestamp;
 
+    // Less than 2 centiseconds
+    if ( difference < 2 * Milliseconds.CENTISECOND )
+        return Unit.MILLISECOND;
+
+    // Less than 2 deciseconds
+    if ( difference < 2 * Milliseconds.DECISECOND )
+        return Unit.CENTISECOND;
+
     // Less than 2 seconds
     if ( difference < 2 * Milliseconds.SECOND )
-        return Unit.MILLISECOND;
+        return Unit.DECISECOND;
 
     // Less than 2 minutes
     if ( difference < 2 * Milliseconds.MINUTE )
@@ -57,6 +69,12 @@ function getNumberUnits(unit, initialTimestamp, finalTimestamp) {
     switch (unit) {
         case Unit.MILLISECOND:
             return Math.round(difference / Milliseconds.MILLISECOND);
+
+        case Unit.DECISECOND:
+            return Math.round(difference / Milliseconds.DECISECOND);
+
+        case Unit.CENTISECOND:
+            return Math.round(difference / Milliseconds.CENTISECOND);
 
         case Unit.SECOND:
             return Math.round(difference / Milliseconds.SECOND);
@@ -97,6 +115,16 @@ function getTimeByUnit(unit, timestamp, op) {
     switch (unit) {
         case Unit.MILLISECOND:
             time.timestamp = op(timestamp, Milliseconds.MILLISECOND);
+            time.value = new Date(time.timestamp).getMilliseconds() + "ms";
+            break;
+
+        case Unit.CENTISECOND:
+            time.timestamp = op(timestamp, Milliseconds.CENTISECOND);
+            time.value = new Date(time.timestamp).getMilliseconds() + "ms";
+            break;
+
+        case Unit.DECISECOND:
+            time.timestamp = op(timestamp, Milliseconds.DECISECOND);
             time.value = new Date(time.timestamp).getMilliseconds() + "ms";
             break;
 
@@ -152,6 +180,14 @@ function getFloorTimeByUnit(unit, timestamp) {
     let date = new Date(timestamp);
     switch (unit) {
         case Unit.MILLISECOND:
+            break;
+
+        case Unit.CENTISECOND:
+            date.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), Math.floor(date.getMilliseconds() / 10) * 10);
+            break;
+
+        case Unit.DECISECOND:
+            date.setHours(date.getHours(), date.getMinutes(), date.getSeconds(), Math.floor(date.getMilliseconds() / 100) * 100);
             break;
 
         case Unit.SECOND:
