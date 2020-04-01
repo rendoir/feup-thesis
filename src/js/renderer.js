@@ -204,7 +204,7 @@ class Renderer {
         // Second div - Next time closest to unit
         this.initTimelineItem(rowTimeline, width, secondTime.value);
 
-        let widthAccumulator = minWidth;
+        let widthAccumulator = widthInPixels;
         let lastTime = secondTime;
         for(let i = 0; i < nrDivisions - 2; i++) {
             lastTime = Utils.getNextTimeByUnit(unit, lastTime.timestamp);
@@ -218,7 +218,7 @@ class Renderer {
         }
 
         // Penultimate div - Previous time closest to unit
-        this.initTimelineItem(rowTimeline, lastWidth + "%", penultimateTime.value);
+        this.initTimelineItem(rowTimeline, lastWidth + "%", penultimateTime.value, widthAccumulator < minWidth);
 
         // Last div - Final time
         this.initTimelineItem(rowTimeline, 0, Utils.getDateString(lastDate));
@@ -236,8 +236,6 @@ class Renderer {
 
         if (shouldHide)
             itemLabel.style.display = 'none';
-
-        return this.initTimelineItem;
     }
 
     rebuildScenes() {

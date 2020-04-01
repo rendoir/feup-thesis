@@ -135,10 +135,6 @@ canvas {
         }
     }
 
-    div:nth-child(2).timeline-item span, div:nth-last-child(2).timeline-item span {
-        display: none; // Hide because it would overlap with the first/last date label
-    }
-
     div:first-child.timeline-item {
         height: 20px;
     }
