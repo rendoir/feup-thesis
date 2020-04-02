@@ -12,12 +12,17 @@ class SettingsManager {
 
         // Scenes group
         this.groups["scenes"] = new Group(rebuildScenes);
+        this.groups["layout"] = new Group(updateLayout);
     }
 
     initSettings() {
         this.settings = {};
 
         this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-arrow"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-grid"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-overlay"] = new Setting(true, [this.groups["scenes"], this.groups["layout"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-description"] = new Setting(true, [this.groups["layout"]], updateSwitch, updateSwitchHTML);
     }
 
     initForm() {
@@ -111,6 +116,10 @@ class Group {
 // Group actions
 function rebuildScenes() {
     SettingsManager.instance.renderer.rebuildScenes();
+}
+
+function updateLayout() {
+    SettingsManager.instance.renderer.update();
 }
 
 // Settings actions

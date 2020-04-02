@@ -45,13 +45,16 @@ class Transformation {
         let cameraTop = Math.max(this.sceneBoundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
 
         let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -500, 500);
-        camera.position.y += cameraPlaneOffset / 2; // Compensate for the overlay
+        if ( this.shouldDisplayOverlay() )
+            camera.position.y += cameraPlaneOffset / 2; // Compensate for the overlay
         
         // Save objects inside scene
         this.scene.userData.camera = camera;
     }
 
     setupGrid() {
+        if ( !this.shouldDisplayGrid() ) return;
+
         let center = new THREE.Vector3(); 
         this.sceneBoundingBox.getCenter(center);
         
@@ -59,7 +62,7 @@ class Transformation {
         // Keep divisions constant
         let boxSize = this.getMaxSceneBoxSize();
         let gridSize = boxSize + boxSize*CAMERA_PADDING*2;
-        let gridCenter = new THREE.Vector3(center.x, center.y - boxSize*CAMERA_PADDING/2, GRID_DEPTH)
+        let gridCenter = new THREE.Vector3(center.x, this.shouldDisplayOverlay() ? center.y - boxSize*CAMERA_PADDING/2 : center.y, GRID_DEPTH)
         let grid = new Grid(gridSize, GRID_DIVISIONS, gridCenter);
 
         this.scene.add(grid);
@@ -128,7 +131,7 @@ class Transformation {
     }
 
     setupLinearVertexMapping() {
-        if (!SettingsManager.instance.getSettingValue("s-vertex-mapping") ) return;
+        if ( !this.shouldUseVertexMapping() ) return;
 
         // Draw dashed lines from each vertex of the initial state to the final state
         let initialState = this.object.states[0];
@@ -187,6 +190,22 @@ class Transformation {
         this.sceneBoundingBox.getSize(boxSize);
         return Math.max(boxSize.x, boxSize.y);
     }
+
+    shouldUseVertexMapping() {
+        return SettingsManager.instance.getSettingValue("s-vertex-mapping");
+    }
+
+    shouldUseArrows() {
+        return SettingsManager.instance.getSettingValue("s-arrow");
+    }
+
+    shouldDisplayGrid() {
+        return SettingsManager.instance.getSettingValue("s-grid");
+    }
+
+    shouldDisplayOverlay() {
+        return SettingsManager.instance.getSettingValue("s-overlay");
+    }
 }
 
 class Translation extends Transformation {
@@ -215,6 +234,8 @@ class Translation extends Transformation {
     }
 
     setupTranslationArrow() {
+        if ( !this.shouldUseArrows() ) return;
+
         // Draw an arrow from the centroid of the object in the first state to it on the final state
         let origin = new THREE.Vector3();
         let destination = new THREE.Vector3();
@@ -258,6 +279,8 @@ class Orientation extends Transformation {
     }
 
     setupRoundArrow() {
+        if ( !this.shouldUseArrows() ) return;
+
         let center = new THREE.Vector3();
         this.sceneBoundingBox.getCenter(center);
         let topRightCorner = new THREE.Vector3(this.sceneBoundingBox.max.x, this.sceneBoundingBox.max.y, center.z);
@@ -276,6 +299,8 @@ class Orientation extends Transformation {
     }
 
     setupArcVertexMapping() {
+        if ( !this.shouldUseVertexMapping() ) return;
+
         let initialState = this.object.states[0];
         let finalState = this.object.states[this.object.states.length-1];
 
@@ -340,29 +365,34 @@ class Rotation extends Transformation {
         group.add( dot );
         this.sceneBoundingBox.expandByPoint(this.pivot);
 
-        let initialState = this.object.states[0];
-        let finalState = this.object.states[this.object.states.length-1];
-        if (initialState && finalState ) {
-            // Draw lines from pivot to state centroid
-            let pivotLineInitial = this._setupPivotLine(initialState, group);
-            let pivotLineFinal = this._setupPivotLine(finalState, group);
-            let minimumDistance = Math.min(pivotLineInitial.halfwayDistance, pivotLineFinal.halfwayDistance);
-            
-            // Draw curved arrow from one line to the other
-            let angleInitial = pivotLineInitial.lineVector.angle();
-            let angleFinal = pivotLineFinal.lineVector.angle();
-            let clockwise = angleFinal < angleInitial;
-            let curvedArrow = new CurvedArrow(0, 0, minimumDistance, minimumDistance, 
-                angleInitial, angleFinal, clockwise, 0, 100, 0x000000, 1, 0.4);
-            curvedArrow.position.x = this.pivot.x;
-            curvedArrow.position.y = this.pivot.y;
-            group.add(curvedArrow);
+        if ( this.shouldUseArrows() ) {
+
+            let initialState = this.object.states[0];
+            let finalState = this.object.states[this.object.states.length-1];
+            if (initialState && finalState ) {
+                // Draw lines from pivot to state centroid
+                let pivotLineInitial = this._setupPivotLine(initialState, group);
+                let pivotLineFinal = this._setupPivotLine(finalState, group);
+                let minimumDistance = Math.min(pivotLineInitial.halfwayDistance, pivotLineFinal.halfwayDistance);
+                
+                // Draw curved arrow from one line to the other
+                let angleInitial = pivotLineInitial.lineVector.angle();
+                let angleFinal = pivotLineFinal.lineVector.angle();
+                let clockwise = angleFinal < angleInitial;
+                let curvedArrow = new CurvedArrow(0, 0, minimumDistance, minimumDistance, 
+                    angleInitial, angleFinal, clockwise, 0, 100, 0x000000, 1, 0.4);
+                curvedArrow.position.x = this.pivot.x;
+                curvedArrow.position.y = this.pivot.y;
+                group.add(curvedArrow);
+            }
         }
 
         this.scene.add( group );
     }
 
     setupArcVertexMapping() {
+        if ( !this.shouldUseVertexMapping() ) return;
+        
         let initialState = this.object.states[0];
         let finalState = this.object.states[this.object.states.length-1];
 

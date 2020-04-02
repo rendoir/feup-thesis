@@ -1,6 +1,7 @@
 const THREE = require('three');
 const RowWrapper = require('./row');
 const Utils = require('./utils');
+const SettingsManager = require('./settings');
 
 const FRAME_WIDTH = 256;
 
@@ -160,6 +161,12 @@ class Renderer {
         this.controller.setFrameDetailEvents(frame.frameElement);
         frame.frameElement.setAttribute("data-frame-id", frameIndex);
         rowWrapper.rowFramesElement.appendChild(frame.frameElement);
+
+        if ( !SettingsManager.instance.getSettingValue("s-overlay") )
+            frame.overlayElement.style.display = 'none';
+
+        if ( !SettingsManager.instance.getSettingValue("s-description") )
+            frame.descriptionElement.style.display = 'none';
     }
 
     initFrameTimelineItem(frame, rowWrapper, frameId, rowDuration) {
