@@ -2,6 +2,7 @@ const THREE = require('three');
 const CurvedArrow = require('./helpers/CurvedArrow');
 const Arc = require('./helpers/Arc');
 const Grid = require('./helpers/Grid');
+const SettingsManager = require('./settings');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
@@ -127,6 +128,8 @@ class Transformation {
     }
 
     setupLinearVertexMapping() {
+        if (!SettingsManager.instance.getSettingValue("s-vertex-mapping") ) return;
+
         // Draw dashed lines from each vertex of the initial state to the final state
         let initialState = this.object.states[0];
         let finalState = this.object.states[this.object.states.length-1];

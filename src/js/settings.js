@@ -1,24 +1,23 @@
-var settingsInstance;
 
 class SettingsManager {
     constructor() {
-        settingsInstance = this;
+        SettingsManager.instance = this;
         this.initGroups();
         this.initSettings();
         this.initForm();
     }
 
     initGroups() {
-        this.group = {};
+        this.groups = {};
 
         // Scenes group
-        this.group["scenes"] = new Group(rebuildScenes);
+        this.groups["scenes"] = new Group(rebuildScenes);
     }
 
     initSettings() {
         this.settings = {};
 
-        this.settings["s-vertex-mapping"] = new Setting(true, updateSwitch);
+        this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
     }
 
     initForm() {
@@ -29,6 +28,11 @@ class SettingsManager {
         this.submitButton.addEventListener("click", (event) => {
             thisManager.onSettingsSaved(event);
         });
+
+        this.openModalButton = document.getElementById("settings");
+        this.openModalButton.addEventListener("click", (event) => {
+            thisManager.onModalOpen(event);
+        });
     }
 
     onSettingsSaved(event) {
@@ -38,6 +42,24 @@ class SettingsManager {
 
             if ( setting !== undefined ) {
                 setting.update(input);
+            }
+        }
+
+        Object.values(this.groups).forEach(group => {
+            if ( group.needsUpdate ) {
+                group.update();
+                group.needsUpdate = false;
+            }
+        });
+    }
+
+    onModalOpen(event) {
+        for (let i = 0; i < this.formInputs.length; i++) {
+            let input = this.formInputs[i];
+            let setting = this.settings[input.id];
+
+            if ( setting !== undefined ) {
+                setting.updateHTML(input);
             }
         }
     }
@@ -52,14 +74,26 @@ class SettingsManager {
 }
 
 class Setting {
-    constructor(defaultValue, updateFunction) {
+    constructor(defaultValue, groups, updateFunction, updateHTMLFunction) {
         this.value = defaultValue;
         this.defaultValue = defaultValue;
         this.updateFunction = updateFunction;
+        this.updateHTMLFunction = updateHTMLFunction;
+        this.groups = groups;
     }
 
     update(input) {
         this.updateFunction.call(this, input);
+    }
+
+    updateHTML(input) {
+        this.updateHTMLFunction.call(this, input);
+    }
+
+    notifyGroups() {
+        this.groups.forEach(group => {
+            group.needsUpdate = true;
+        });
     }
 }
 
@@ -76,15 +110,20 @@ class Group {
 
 // Group actions
 function rebuildScenes() {
-    settingsInstance.renderer.rebuildScenes();
+    SettingsManager.instance.renderer.rebuildScenes();
 }
 
 // Settings actions
 function updateSwitch(input) {
+    if (this.value != input.checked) {
+        this.notifyGroups();
+    }
+
     this.value = input.checked;
 }
 
-module.exports = {
-    SettingsManager : SettingsManager,
-    settingsInstance : settingsInstance
-};
+function updateSwitchHTML(input) {
+    input.checked = this.value;
+}
+
+module.exports = SettingsManager;
