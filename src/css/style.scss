@@ -197,4 +197,16 @@ header {
 /* Modal */
 .modal-body .form-group {
     font-size: 0.95em;
+
+    .form-line {
+        display:flex;
+        align-items:center;
+        justify-content: space-between;
+        padding-left: 2.4em;
+        padding-right: 2.4em;
+
+        select {
+            width: 40%;
+        }
+    }
 }

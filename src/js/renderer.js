@@ -281,6 +281,8 @@ class Renderer {
 
         if (!this.shouldRender)
             return;
+
+        let hierarchySettings = SettingsManager.instance.getSettingValue("s-hierarchy");
     
         // Render each scene and dashed lines
         for (let i = 0; i < this.visibleFrames.length; i++) {
@@ -305,7 +307,7 @@ class Renderer {
             }
 
             // Render dashed lines
-            this.renderDashedLines(i, rowInfo, visibleFramesInRow);
+            this.renderHierarchy(i, rowInfo, visibleFramesInRow, hierarchySettings);
         }
     }
 
@@ -332,9 +334,12 @@ class Renderer {
         this.renderer.render(frame.scene, camera);
     }
 
-    renderDashedLines(i, rowInfo, visibleFramesInRow) {
+    renderHierarchy(i, rowInfo, visibleFramesInRow, hierarchySettings) {
         // Skip the first row
         if (i > 0) {
+            // Get rectangle of the frame timeline in the zoomed row
+            let frameTimelineRect = visibleFramesInRow.rowWrapper.rowFrameTimeline.getBoundingClientRect();
+
             // Check if the frame that got zoomed is visible
             let previousRowInfo = this.visibleFramesInfo[i-1];
             let previousRowFrames = this.visibleFrames[i-1];
@@ -346,14 +351,18 @@ class Renderer {
                     let previousFrameElement = previousRowFrames.frameObjects[rowInfo.zoomedFromFrame - previousRowInfo.start].frameElement;
                     let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                    // Get rectangle of the frame timeline in the zoomed row
-                    let frameTimelineRect = visibleFramesInRow.rowWrapper.rowFrameTimeline.getBoundingClientRect();
-                    // Draw left line
-                    this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                        frameTimelineRect.left, frameTimelineRect.top);
-                    // Draw left line
-                    this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                        frameTimelineRect.right, frameTimelineRect.top);
+                    if ( hierarchySettings === "fill" ) {
+                        this.drawPolygon(previousFrameElementRect.left, previousFrameElementRect.bottom, previousFrameElementRect.right, previousFrameElementRect.bottom, 
+                            frameTimelineRect.left, frameTimelineRect.top, frameTimelineRect.right, frameTimelineRect.top);
+                    } else if ( hierarchySettings === "line" ) {
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                            frameTimelineRect.left, frameTimelineRect.top);
+                        // Draw left line
+                        this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                            frameTimelineRect.right, frameTimelineRect.top);
+                    }
+
                 } else {
                     // The frame is not visible -> Draw from the nearest point to the next row
 
@@ -362,27 +371,34 @@ class Renderer {
                         let previousFrameElement = previousRowFrames.frameObjects[0].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                        // Get rectangle of the frame timeline in the zoomed row
-                        let frameTimelineRect = visibleFramesInRow.rowWrapper.rowFrameTimeline.getBoundingClientRect();
-                        // Draw left line
-                        this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                            frameTimelineRect.left, frameTimelineRect.top);
-                        // Draw left line
-                        this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
-                            frameTimelineRect.right, frameTimelineRect.top);
+                        if ( hierarchySettings === "fill" ) {
+                            this.drawPolygon(previousFrameElementRect.left, previousFrameElementRect.bottom, previousFrameElementRect.left, previousFrameElementRect.bottom, 
+                                frameTimelineRect.left, frameTimelineRect.top, frameTimelineRect.right, frameTimelineRect.top);
+                        } else if ( hierarchySettings === "line" ) {
+                            // Draw left line
+                            this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                                frameTimelineRect.left, frameTimelineRect.top);
+                            // Draw left line
+                            this.drawDashedLine(previousFrameElementRect.left, previousFrameElementRect.bottom,
+                                frameTimelineRect.right, frameTimelineRect.top);
+                        }
+
                     } else {
                         // Select the right-most frame
                         let previousFrameElement = previousRowFrames.frameObjects[previousRowFrames.frameObjects.length-1].frameElement;
                         let previousFrameElementRect = previousFrameElement.getBoundingClientRect();
 
-                        // Get rectangle of the frame timeline in the zoomed row
-                        let frameTimelineRect = visibleFramesInRow.rowWrapper.rowFrameTimeline.getBoundingClientRect();
-                        // Draw left line
-                        this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                            frameTimelineRect.left, frameTimelineRect.top);
-                        // Draw left line
-                        this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
-                            frameTimelineRect.right, frameTimelineRect.top);
+                        if ( hierarchySettings === "fill" ) {
+                            this.drawPolygon(previousFrameElementRect.right, previousFrameElementRect.bottom, previousFrameElementRect.right, previousFrameElementRect.bottom, 
+                                frameTimelineRect.left, frameTimelineRect.top, frameTimelineRect.right, frameTimelineRect.top);
+                        } else if ( hierarchySettings === "line" ) {
+                            // Draw left line
+                            this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                                frameTimelineRect.left, frameTimelineRect.top);
+                            // Draw left line
+                            this.drawDashedLine(previousFrameElementRect.right, previousFrameElementRect.bottom,
+                                frameTimelineRect.right, frameTimelineRect.top);
+                        }
                     }
                 }
         }
@@ -394,6 +410,18 @@ class Renderer {
         this.contextFullscreen.moveTo(fromX, fromY);
         this.contextFullscreen.lineTo(toX, toY);
         this.contextFullscreen.stroke();
+    }
+
+    drawPolygon(upperLeftX, upperLeftY, upperRightX, upperRightY, 
+        bottomLeftX, bottomLeftY, bottomRightX, bottomRightY) {
+        this.contextFullscreen.fillStyle = '#00000040';
+        this.contextFullscreen.beginPath();
+        this.contextFullscreen.moveTo(upperLeftX, upperLeftY);
+        this.contextFullscreen.lineTo(bottomLeftX, bottomLeftY);
+        this.contextFullscreen.lineTo(bottomRightX, bottomRightY);
+        this.contextFullscreen.lineTo(upperRightX, upperRightY);
+        this.contextFullscreen.closePath();
+        this.contextFullscreen.fill();
     }
 
     updateSize() {

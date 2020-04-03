@@ -23,11 +23,12 @@ class SettingsManager {
         this.settings["s-grid"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-overlay"] = new Setting(true, [this.groups["scenes"], this.groups["layout"]], updateSwitch, updateSwitchHTML);
         this.settings["s-description"] = new Setting(true, [this.groups["layout"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-hierarchy"] = new Setting("fill", [], updateSelect, updateSelectHTML);
     }
 
     initForm() {
         this.form = document.getElementById("settings-form");
-        this.formInputs = this.form.getElementsByTagName("input");
+        this.formInputs = this.form.querySelectorAll("input,select");
         this.submitButton = document.getElementById("settings-form-submit");
         let thisManager = this;
         this.submitButton.addEventListener("click", (event) => {
@@ -46,7 +47,9 @@ class SettingsManager {
             let setting = this.settings[input.id];
 
             if ( setting !== undefined ) {
-                setting.update(input);
+                if ( setting.update(input) ) {
+                    setting.notifyGroups();
+                }
             }
         }
 
@@ -88,7 +91,7 @@ class Setting {
     }
 
     update(input) {
-        this.updateFunction.call(this, input);
+        return this.updateFunction.call(this, input);
     }
 
     updateHTML(input) {
@@ -124,15 +127,23 @@ function updateLayout() {
 
 // Settings actions
 function updateSwitch(input) {
-    if (this.value != input.checked) {
-        this.notifyGroups();
-    }
-
+    let changed = this.value != input.checked;
     this.value = input.checked;
+    return changed;
 }
 
 function updateSwitchHTML(input) {
     input.checked = this.value;
+}
+
+function updateSelect(input) {
+    let changed = this.value != input.value;
+    this.value = input.value;
+    return changed;
+}
+
+function updateSelectHTML(input) {
+    input.value = this.value;
 }
 
 module.exports = SettingsManager;
