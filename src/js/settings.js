@@ -22,6 +22,7 @@ class SettingsManager {
         this.settings["s-arrow"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-grid"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-overlay"] = new Setting(true, [this.groups["scenes"], this.groups["layout"]], updateSwitch, updateSwitchHTML);
+        this.settings["s-intermediate-states"] = new Setting(1, [this.groups["scenes"]], updateNumber, updateNumberHTML);
         this.settings["s-description"] = new Setting(true, [this.groups["layout"]], updateSwitch, updateSwitchHTML);
         this.settings["s-hierarchy"] = new Setting("fill", [], updateSelect, updateSelectHTML);
     }
@@ -143,6 +144,16 @@ function updateSelect(input) {
 }
 
 function updateSelectHTML(input) {
+    input.value = this.value;
+}
+
+function updateNumber(input) {
+    let changed = this.value != input.value;
+    this.value = parseInt(input.value);
+    return changed;
+}
+
+function updateNumberHTML(input) {
     input.value = this.value;
 }
 

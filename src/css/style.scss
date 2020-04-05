@@ -198,6 +198,10 @@ header {
 .modal-body .form-group {
     font-size: 0.95em;
 
+    label {
+        margin-bottom: 0;
+    }
+
     .form-line {
         display:flex;
         align-items:center;
@@ -205,7 +209,7 @@ header {
         padding-left: 2.4em;
         padding-right: 2.4em;
 
-        select {
+        select, input[type="number"] {
             width: 40%;
         }
     }
