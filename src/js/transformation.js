@@ -3,6 +3,7 @@ const CurvedArrow = require('./helpers/CurvedArrow');
 const Arc = require('./helpers/Arc');
 const Grid = require('./helpers/Grid');
 const SettingsManager = require('./settings');
+const { simplify } = require('./utils');
 
 const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
@@ -140,10 +141,15 @@ class Transformation {
         if ( initialState && finalState ) {
             let sceneScale = this.getMaxSceneBoxSize();
 
+            let useSimplification = this.shouldSimplifyVertices();
+            if ( useSimplification ) this.simplifyVertices();
+
             // Assume same number of vertices and same order
             for (let i = 0; i < initialState.vertices.length; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
+
+                if ( useSimplification && !initialVertex.shouldBeVisible ) continue;
 
                 // Line
                 let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
@@ -176,6 +182,16 @@ class Transformation {
         }
     }
 
+    simplifyVertices() {
+        // Simplify initial state
+        let initialState = this.object.states[0];
+        let boxSize = new THREE.Vector3();
+        initialState.boundingBox.getSize(boxSize);
+        let maxSize = Math.max(boxSize.x, boxSize.y);
+        let tolerance = 0.04 * maxSize;
+        simplify(initialState.vertices, tolerance, false);
+    }
+
     _getColor(i, nStates) {
         return OBJECT_COLOR;  
     }
@@ -205,6 +221,10 @@ class Transformation {
 
     shouldDisplayOverlay() {
         return SettingsManager.instance.getSettingValue("s-overlay");
+    }
+
+    shouldSimplifyVertices() {
+        return SettingsManager.instance.getSettingValue("s-simplification");
     }
 }
 
@@ -305,6 +325,9 @@ class Orientation extends Transformation {
         let finalState = this.object.states[this.object.states.length-1];
 
         if ( initialState && finalState ) {
+            let useSimplification = this.shouldSimplifyVertices();
+            if ( useSimplification ) this.simplifyVertices();
+            
             // Consider the center to be the mid point between the center of the two bounding boxes
             let initialStateCenter = new THREE.Vector3(); 
             initialState.boundingBox.getCenter(initialStateCenter);
@@ -317,6 +340,8 @@ class Orientation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {   
+                if ( useSimplification && !initialState.vertices[i].shouldBeVisible ) continue;
+
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
                 let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);       
 
@@ -397,6 +422,9 @@ class Rotation extends Transformation {
         let finalState = this.object.states[this.object.states.length-1];
 
         if ( initialState && finalState ) {
+            let useSimplification = this.shouldSimplifyVertices();
+            if ( useSimplification ) this.simplifyVertices();
+
             // Get bounding box size
             let sceneScale = this.getMaxSceneBoxSize();
 
@@ -404,6 +432,8 @@ class Rotation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
+                if ( useSimplification && !initialState.vertices[i].shouldBeVisible ) continue;
+
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
                 let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);
 
