@@ -9,7 +9,8 @@ let storyboard = new Storyboard();
 let controller = new Controller();
 let renderer = new Renderer();
 
-Loader.LoadFramesDemo1(storyboard);
+//Loader.LoadFramesDemo1(storyboard);
+Loader.LoadRealTest1(storyboard);
 renderer.setStoryboard(storyboard);
 renderer.setController(controller);
 controller.setStoryboard(storyboard);
