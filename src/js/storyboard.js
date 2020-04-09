@@ -1,3 +1,5 @@
+const Controller = require('./controller');
+
 class Storyboard {
     constructor() {
         // Array of initial frames (depth = 0)
@@ -7,6 +9,7 @@ class Storyboard {
 
     setFrames(frames) {
         this.frames = frames;
+        Controller.instance.onDatasetChanged();
     }
 
     traverseFrames(callback) {
@@ -19,4 +22,4 @@ class Storyboard {
     }
 }
 
-module.exports = Storyboard;
+module.exports.instance = new Storyboard();

@@ -1,4 +1,7 @@
 const THREE = require('three');
+
+const Storyboard = require('./storyboard');
+const Controller = require('./controller');
 const RowWrapper = require('./row');
 const Utils = require('./utils');
 const SettingsManager = require('./settings');
@@ -37,14 +40,6 @@ class Renderer {
         this.renderLoop();
     }
 
-    setStoryboard(storyboard) {
-        this.storyboard = storyboard;
-    }
-
-    setController(controller) {
-        this.controller = controller;
-    }
-
     setVisibleFramesInfo(info) {
         this.visibleFramesInfo = info;
         this.update();
@@ -76,7 +71,7 @@ class Renderer {
             // Retrieve the correct row from the storyboard
             let row;
             if (infoIndex == 0)
-                row = this.storyboard.frames; // Initial set of frames (depth = 0)
+                row = Storyboard.instance.frames; // Initial set of frames (depth = 0)
             else row = previousRow[info.zoomedFromFrame].childFrames; // Access the element that got zoomed from the previous row
 
             // Exit if there are no frames
@@ -141,7 +136,7 @@ class Renderer {
         rowWrapper.rowElement.setAttribute("data-row-id", infoIndex);
         rowWrapper.rowFrameTimeline.setAttribute("data-row-id", infoIndex);
         this.contentElement.appendChild(rowWrapper.rowContainer);
-        this.controller.setNavigationEvents(rowWrapper.rowElement);
+        Controller.instance.setNavigationEvents(rowWrapper.rowElement);
         
         return rowWrapper;
     }
@@ -158,7 +153,7 @@ class Renderer {
         frame.descriptionElement.title = frame.transformation.getDetails();
         $(frame.descriptionElement).tooltip();
 
-        this.controller.setFrameDetailEvents(frame.frameElement);
+        Controller.instance.setFrameDetailEvents(frame.frameElement);
         frame.frameElement.setAttribute("data-frame-id", frameIndex);
         rowWrapper.rowFramesElement.appendChild(frame.frameElement);
 
@@ -178,7 +173,7 @@ class Renderer {
         frameTimelineItem.setAttribute("data-frame-id", frameId);
         frameTimelineItem.style.width = (frameDuration / rowDuration) * 100 + '%';
         rowWrapper.rowFrameTimeline.appendChild(frameTimelineItem);
-        this.controller.setFrameTimelineItemEvent(frameTimelineItem);
+        Controller.instance.setFrameTimelineItemEvent(frameTimelineItem);
 
         return frameTimelineItem;
     }
@@ -246,7 +241,7 @@ class Renderer {
     }
 
     rebuildScenes() {
-        this.storyboard.traverseFrames((frame) => {
+        Storyboard.instance.traverseFrames((frame) => {
             frame.setupScene();
         });
     }
@@ -448,4 +443,4 @@ class Renderer {
     }
 }
 
-module.exports = Renderer;
+module.exports.instance = new Renderer();

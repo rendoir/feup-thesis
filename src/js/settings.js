@@ -1,7 +1,6 @@
 
 class SettingsManager {
     constructor() {
-        SettingsManager.instance = this;
         this.initGroups();
         this.initSettings();
         this.initForm();
@@ -76,10 +75,6 @@ class SettingsManager {
 
     getSettingValue(key) {
         return this.settings[key].value;
-    }
-
-    setRenderer(renderer) {
-        this.renderer = renderer;
     }
 }
 
@@ -158,4 +153,4 @@ function updateNumberHTML(input) {
     input.value = this.value;
 }
 
-module.exports = SettingsManager;
+module.exports.instance = new SettingsManager();

@@ -1,3 +1,6 @@
+const Renderer = require('./renderer');
+const Storyboard = require('./storyboard');
+
 /**
  * Handles input from user (zoom, navigation, parameters)
  */
@@ -6,13 +9,8 @@ class Controller {
         this.visibleFramesInfo = [];
     }
 
-    setRenderer(renderer) {
-        this.renderer = renderer;
+    onDatasetChanged() {
         this.initVisibleFramesInfo();
-    }
-
-    setStoryboard(storyboard) {
-        this.storyboard = storyboard;
     }
 
     initVisibleFramesInfo() {       
@@ -24,7 +22,7 @@ class Controller {
             zoomedFromFrame: -1
         });
 
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
+        Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     setNavigationEvents(row) {
@@ -43,7 +41,7 @@ class Controller {
         this.visibleFramesInfo[rowId].start = 
             Math.max(this.visibleFramesInfo[rowId].start - Controller.rowNavigationStep, 0);
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
+        Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     onNavigationClickRight() {
@@ -54,10 +52,10 @@ class Controller {
         // Increment and clamp to total number of frames
         this.visibleFramesInfo[rowId].start = Math.max(0, 
             Math.min(this.visibleFramesInfo[rowId].start + Controller.rowNavigationStep,
-                this.getTotalNumberFramesInRow(rowId) - this.renderer.maxFramesPerPage)
+                this.getTotalNumberFramesInRow(rowId) - Renderer.instance.maxFramesPerPage)
         );
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
+        Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     setFrameDetailEvents(frameElement) {
@@ -89,7 +87,7 @@ class Controller {
                 });
             }
 
-            this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
+            Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
         }
     }
 
@@ -106,9 +104,9 @@ class Controller {
 
         // Set start to the frame clicked
         
-        this.visibleFramesInfo[rowId].start = Math.max(0, Math.min(frameId, this.getTotalNumberFramesInRow(rowId) - this.renderer.maxFramesPerPage));
+        this.visibleFramesInfo[rowId].start = Math.max(0, Math.min(frameId, this.getTotalNumberFramesInRow(rowId) - Renderer.instance.maxFramesPerPage));
         //console.log(`Row: ${rowId} | Start: ${this.visibleFramesInfo[rowId].start}`);
-        this.renderer.setVisibleFramesInfo(this.visibleFramesInfo);
+        Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
     getTotalNumberFramesInRow(rowId) {
@@ -119,7 +117,7 @@ class Controller {
             const info = this.visibleFramesInfo[i];
 
             if (i == 0)
-                row = this.storyboard.frames; // Initial set of frames (depth = 0)
+                row = Storyboard.instance.frames; // Initial set of frames (depth = 0)
             else row = row[info.zoomedFromFrame].childFrames; // Access the element that got zoomed from the previous row
             i++;
         }
@@ -133,4 +131,4 @@ class Controller {
     static get rowNavigationStep() { return 1; }
 }
 
-module.exports = Controller;
+module.exports.instance = new Controller();
