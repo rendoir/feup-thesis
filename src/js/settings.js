@@ -1,3 +1,4 @@
+const Renderer = require('./renderer');
 
 class SettingsManager {
     constructor() {
@@ -115,11 +116,11 @@ class Group {
 
 // Group actions
 function rebuildScenes() {
-    SettingsManager.instance.renderer.rebuildScenes();
+    Renderer.instance.rebuildScenes();
 }
 
 function updateLayout() {
-    SettingsManager.instance.renderer.update();
+    Renderer.instance.update();
 }
 
 // Settings actions
