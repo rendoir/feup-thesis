@@ -49,6 +49,10 @@ class Renderer {
         // When new frame info is set, clear all the content and write new
         this.shouldRender = false;
 
+        // Get settings
+        let shouldDrawOverlay = SettingsManager.instance.getSettingValue("s-overlay");
+        let shouldDrawDescription = SettingsManager.instance.getSettingValue("s-description");
+
         // Clear all tooltips
         let tooltips = document.getElementsByClassName("tooltip");
         for (let i = 0; i < tooltips.length; i++) {
@@ -98,7 +102,7 @@ class Renderer {
                 // Check if frame is visible
                 if (frameIndex >= info.start && frameIndex < end) {
                     // Create new frame element
-                    this.initFrame(frame, frameIndex, rowWrapper);
+                    this.initFrame(frame, frameIndex, rowWrapper, shouldDrawOverlay, shouldDrawDescription);
 
                     // Add to visible frame
                     frameTimelineItem.classList.add("frame-visible");
@@ -141,7 +145,7 @@ class Renderer {
         return rowWrapper;
     }
 
-    initFrame(frame, frameIndex, rowWrapper) {
+    initFrame(frame, frameIndex, rowWrapper, shouldDrawOverlay, shouldDrawDescription) {
         // Create a frame HTML element from the template
         frame.frameElement = this.frameTemplate.content.cloneNode(true).firstElementChild;
         frame.overlayElement = frame.frameElement.getElementsByClassName("overlay")[0];
@@ -157,10 +161,10 @@ class Renderer {
         frame.frameElement.setAttribute("data-frame-id", frameIndex);
         rowWrapper.rowFramesElement.appendChild(frame.frameElement);
 
-        if ( !SettingsManager.instance.getSettingValue("s-overlay") )
+        if ( !shouldDrawOverlay )
             frame.overlayElement.style.display = 'none';
 
-        if ( !SettingsManager.instance.getSettingValue("s-description") )
+        if ( !shouldDrawDescription )
             frame.descriptionElement.style.display = 'none';
     }
 

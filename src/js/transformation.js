@@ -28,8 +28,16 @@ class Transformation {
         this.scene = scene;
         this.object = object;
         this.sceneBoundingBox = null;
+        
+        // Init settings
         this.colorHue = SettingsManager.instance.getSettingValue("s-color") / 360.0;
         this.defaultColor = new THREE.Color().setHSL(this.colorHue, 1, 0.5); 
+        this.shouldUseVertexMapping = SettingsManager.instance.getSettingValue("s-vertex-mapping");
+        this.shouldUseArrows = SettingsManager.instance.getSettingValue("s-arrow");
+        this.shouldDisplayGrid = SettingsManager.instance.getSettingValue("s-grid");
+        this.shouldDisplayOverlay = SettingsManager.instance.getSettingValue("s-overlay");
+        this.shouldSimplifyVertices = SettingsManager.instance.getSettingValue("s-simplification");
+        this.maximumNumberStates = SettingsManager.instance.getSettingValue("s-intermediate-states");
     }
 
     setupSceneCamera() {
@@ -46,7 +54,7 @@ class Transformation {
         let cameraTop = Math.max(this.sceneBoundingBox.max.y, boundingBoxCenter.y + boundingBoxSize.x / 2) + cameraPlaneOffset;
 
         let camera = new THREE.OrthographicCamera(cameraLeft, cameraRight, cameraTop, cameraBottom, -500, 500);
-        if ( this.shouldDisplayOverlay() )
+        if ( this.shouldDisplayOverlay )
             camera.position.y += cameraPlaneOffset / 2; // Compensate for the overlay
         
         // Save objects inside scene
@@ -54,7 +62,7 @@ class Transformation {
     }
 
     setupGrid() {
-        if ( !this.shouldDisplayGrid() ) return;
+        if ( !this.shouldDisplayGrid ) return;
 
         let center = new THREE.Vector3(); 
         this.sceneBoundingBox.getCenter(center);
@@ -63,15 +71,40 @@ class Transformation {
         // Keep divisions constant
         let boxSize = this.getMaxSceneBoxSize();
         let gridSize = boxSize + boxSize*CAMERA_PADDING*2;
-        let gridCenter = new THREE.Vector3(center.x, this.shouldDisplayOverlay() ? center.y - boxSize*CAMERA_PADDING/2 : center.y, GRID_DEPTH)
+        let gridCenter = new THREE.Vector3(center.x, this.shouldDisplayOverlay ? center.y - boxSize*CAMERA_PADDING/2 : center.y, GRID_DEPTH)
         let grid = new Grid(gridSize, GRID_DIVISIONS, gridCenter);
 
         this.scene.add(grid);
     }
 
     setupOnionSkinning() {
-        // Setup all the states
-        this._setupObjectStates(this.object.states);
+        if ( this.maximumNumberStates == 0 ) {
+
+            // Setup only the first and final states
+            this.setupInitialFinalStates();
+
+        } else if ( this.maximumNumberStates < 0 || this.maximumNumberStates+2 >= this.object.states.length) {
+
+            // Setup all the states
+            this._setupObjectStates(this.object.states);
+
+        } else {
+
+            // Get largest factor of length-1 smaller or equal to x-1
+            let x = this.maximumNumberStates + 2;
+            while((this.object.states.length-1) % (x-1) != 0)
+                x -= 1;
+
+            // Get all x evenly spaced states
+            let step = (this.object.states.length-1) / (x-1);
+            let states = [];
+            for (let i = 0; i < x; i++)
+                states.push(this.object.states[i*step]);
+
+            // Setup at most maximumNumberStates intermediate states
+            this._setupObjectStates(states);
+
+        }
     }
 
     setupInitialFinalStates() {
@@ -132,7 +165,7 @@ class Transformation {
     }
 
     setupLinearVertexMapping() {
-        if ( !this.shouldUseVertexMapping() ) return;
+        if ( !this.shouldUseVertexMapping ) return;
 
         // Draw dashed lines from each vertex of the initial state to the final state
         let initialState = this.object.states[0];
@@ -141,15 +174,14 @@ class Transformation {
         if ( initialState && finalState ) {
             let sceneScale = this.getMaxSceneBoxSize();
 
-            let useSimplification = this.shouldSimplifyVertices();
-            if ( useSimplification ) this.simplifyVertices();
+            if ( this.shouldSimplifyVertices ) this.simplifyVertices();
 
             // Assume same number of vertices and same order
             for (let i = 0; i < initialState.vertices.length; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
 
-                if ( useSimplification && !initialVertex.shouldBeVisible ) continue;
+                if ( this.shouldSimplifyVertices && !initialVertex.shouldBeVisible ) continue;
 
                 // Line
                 let geometryPoints = new THREE.BufferGeometry().setFromPoints( [initialVertex, finalVertex] );
@@ -206,26 +238,6 @@ class Transformation {
         this.sceneBoundingBox.getSize(boxSize);
         return Math.max(boxSize.x, boxSize.y);
     }
-
-    shouldUseVertexMapping() {
-        return SettingsManager.instance.getSettingValue("s-vertex-mapping");
-    }
-
-    shouldUseArrows() {
-        return SettingsManager.instance.getSettingValue("s-arrow");
-    }
-
-    shouldDisplayGrid() {
-        return SettingsManager.instance.getSettingValue("s-grid");
-    }
-
-    shouldDisplayOverlay() {
-        return SettingsManager.instance.getSettingValue("s-overlay");
-    }
-
-    shouldSimplifyVertices() {
-        return SettingsManager.instance.getSettingValue("s-simplification");
-    }
 }
 
 class Translation extends Transformation {
@@ -254,7 +266,7 @@ class Translation extends Transformation {
     }
 
     setupTranslationArrow() {
-        if ( !this.shouldUseArrows() ) return;
+        if ( !this.shouldUseArrows ) return;
 
         // Draw an arrow from the centroid of the object in the first state to it on the final state
         let origin = new THREE.Vector3();
@@ -299,7 +311,7 @@ class Orientation extends Transformation {
     }
 
     setupRoundArrow() {
-        if ( !this.shouldUseArrows() ) return;
+        if ( !this.shouldUseArrows ) return;
 
         let center = new THREE.Vector3();
         this.sceneBoundingBox.getCenter(center);
@@ -319,14 +331,13 @@ class Orientation extends Transformation {
     }
 
     setupArcVertexMapping() {
-        if ( !this.shouldUseVertexMapping() ) return;
+        if ( !this.shouldUseVertexMapping ) return;
 
         let initialState = this.object.states[0];
         let finalState = this.object.states[this.object.states.length-1];
 
         if ( initialState && finalState ) {
-            let useSimplification = this.shouldSimplifyVertices();
-            if ( useSimplification ) this.simplifyVertices();
+            if ( this.shouldSimplifyVertices ) this.simplifyVertices();
             
             // Consider the center to be the mid point between the center of the two bounding boxes
             let initialStateCenter = new THREE.Vector3(); 
@@ -340,7 +351,7 @@ class Orientation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {   
-                if ( useSimplification && !initialState.vertices[i].shouldBeVisible ) continue;
+                if ( this.shouldSimplifyVertices && !initialState.vertices[i].shouldBeVisible ) continue;
 
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
                 let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);       
@@ -390,7 +401,7 @@ class Rotation extends Transformation {
         group.add( dot );
         this.sceneBoundingBox.expandByPoint(this.pivot);
 
-        if ( this.shouldUseArrows() ) {
+        if ( this.shouldUseArrows ) {
 
             let initialState = this.object.states[0];
             let finalState = this.object.states[this.object.states.length-1];
@@ -416,14 +427,13 @@ class Rotation extends Transformation {
     }
 
     setupArcVertexMapping() {
-        if ( !this.shouldUseVertexMapping() ) return;
+        if ( !this.shouldUseVertexMapping ) return;
         
         let initialState = this.object.states[0];
         let finalState = this.object.states[this.object.states.length-1];
 
         if ( initialState && finalState ) {
-            let useSimplification = this.shouldSimplifyVertices();
-            if ( useSimplification ) this.simplifyVertices();
+            if ( this.shouldSimplifyVertices ) this.simplifyVertices();
 
             // Get bounding box size
             let sceneScale = this.getMaxSceneBoxSize();
@@ -432,7 +442,7 @@ class Rotation extends Transformation {
 
             // Loop all vertices
             for (let i = 0; i < initialState.vertices.length; i++) {                
-                if ( useSimplification && !initialState.vertices[i].shouldBeVisible ) continue;
+                if ( this.shouldSimplifyVertices && !initialState.vertices[i].shouldBeVisible ) continue;
 
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
                 let end = new THREE.Vector3(finalState.vertices[i].x, finalState.vertices[i].y, 0);
