@@ -24,6 +24,7 @@ class SettingsManager {
         this.settings["s-overlay"] = new Setting(true, [this.groups["scenes"], this.groups["layout"]], updateSwitch, updateSwitchHTML);
         this.settings["s-simplification"] = new Setting(false, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-intermediate-states"] = new Setting(1, [this.groups["scenes"]], updateNumber, updateNumberHTML);
+        this.settings["s-color"] = new Setting(0, [this.groups["scenes"]], updateNumber, updateRangeHTML);
         this.settings["s-description"] = new Setting(true, [this.groups["layout"]], updateSwitch, updateSwitchHTML);
         this.settings["s-hierarchy"] = new Setting("fill", [], updateSelect, updateSelectHTML);
     }
@@ -152,6 +153,11 @@ function updateNumber(input) {
 
 function updateNumberHTML(input) {
     input.value = this.value;
+}
+
+function updateRangeHTML(input) {
+    input.value = this.value;
+    input.oninput({ target: input });
 }
 
 module.exports.instance = new SettingsManager();

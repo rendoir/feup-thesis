@@ -9,8 +9,6 @@ const ARROW_DEPTH = 250;
 const MAPPING_DEPTH = -1;
 const GRID_DEPTH = -250;
 
-const OBJECT_COLOR = 0xff0000;
-
 const CAMERA_PADDING = 0.25;
 const GRID_DIVISIONS = 3;
 
@@ -30,6 +28,8 @@ class Transformation {
         this.scene = scene;
         this.object = object;
         this.sceneBoundingBox = null;
+        this.colorHue = SettingsManager.instance.getSettingValue("s-color") / 360.0;
+        this.defaultColor = new THREE.Color().setHSL(this.colorHue, 1, 0.5); 
     }
 
     setupSceneCamera() {
@@ -193,7 +193,7 @@ class Transformation {
     }
 
     _getColor(i, nStates) {
-        return OBJECT_COLOR;  
+        return this.defaultColor;
     }
 
     _getOpacity(i, nStates) {
@@ -491,11 +491,8 @@ class Scale extends Transformation {
     }
 
     _getColor(i, nStates) {
-        let h = 0;
-        let s = 1;
         let l = 1 - (0.2 + (i / (nStates - 1)) * 0.3);
-
-        return new THREE.Color().setHSL(h, s, l);
+        return new THREE.Color().setHSL(this.colorHue, 1, l);
     }
 
     _getOpacity(i, nStates) {

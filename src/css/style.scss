@@ -209,8 +209,48 @@ header {
         padding-left: 2.4em;
         padding-right: 2.4em;
 
-        select, input[type="number"] {
+        select, input[type="number"], input[type="range"] {
             width: 40%;
         }
+
+        /* Range */
+        .custom-range::-moz-range-track {
+            height: 12px;
+            background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%)) !important;
+        }
+
+        .custom-range::-webkit-slider-runnable-track {
+            background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%)) !important;
+        }
+
+        .custom-range::-ms-track {
+            background: linear-gradient(to right,hsl(0,100%,50%),hsl(60,100%,50%),hsl(120,100%,50%),hsl(180,100%,50%),hsl(240,100%,50%),hsl(300,100%,50%),hsl(360,100%,50%)) !important;
+        }
+
+        .custom-range {
+            --custom-thumb-color: white;
+        }
+
+        .custom-range::-moz-range-thumb {
+            border: solid 1px dark;
+            background-color: white;
+            background-color: var(--custom-thumb-color);
+        }
+
+        .custom-range::-webkit-slider-thumb {
+            border: solid 1px black;
+            background-color: white;
+            background-color: var(--custom-thumb-color);
+        }
+
+        .custom-range::-ms-thumb {
+            border: solid 1px black;
+            background-color: white;
+            background-color: var(--custom-thumb-color);
+        }
+    }
+
+    .custom-control, .form-line {
+        height: 1.9rem;
     }
 }
