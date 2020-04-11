@@ -10,9 +10,13 @@ class Loader {
     }
 
     static LoadRealTest1(storyboard) {
-        const json = require('./demos/test1.json');
-        let frames = Loader.ParseJson(json);
+        let frames = Loader.ParseRealTest1();
         storyboard.setFrames(frames);
+    }
+
+    static ParseRealTest1() {
+        const json = require('./demos/test1.json');
+        return Loader.ParseJson(json);
     }
 
     static ParseJson(json) {

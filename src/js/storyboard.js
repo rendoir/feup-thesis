@@ -17,7 +17,8 @@ class Storyboard {
         while( queue.length !== 0 ) {
             let frame = queue.shift();
             callback(frame);
-            queue.push(...frame.childFrames);
+            if ( frame.childFrames !== null )
+                queue.push(...frame.childFrames);
         }
     }
 }

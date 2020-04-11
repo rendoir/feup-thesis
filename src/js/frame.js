@@ -8,7 +8,7 @@ class Frame {
     constructor(object, transformation, initialTimestamp, finalTimestamp) {
         this.object = object;
         this.transformation = transformation;
-        this.childFrames = [];
+        this.childFrames = null;
         this.uid = Frame.count;
         Frame.count += 1;
 
@@ -22,6 +22,13 @@ class Frame {
         this.sceneElement = null;
 
         this.setupScene();
+    }
+
+    addChildFrame(childFrame) {
+        if ( this.childFrames === null )
+            this.childFrames = [];
+
+        this.childFrames.push(childFrame);
     }
 
     setupScene() {

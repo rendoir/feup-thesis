@@ -79,7 +79,7 @@ class Renderer {
             else row = previousRow[info.zoomedFromFrame].childFrames; // Access the element that got zoomed from the previous row
 
             // Exit if there are no frames
-            if (row.length === 0) continue;
+            if (row === null || row.length === 0) continue;
 
             // Create a new row element
             let rowWrapper = this.initRow(infoIndex);

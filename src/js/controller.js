@@ -1,5 +1,6 @@
 const Renderer = require('./renderer');
 const Storyboard = require('./storyboard');
+const Loader = require('./loader');
 
 /**
  * Handles input from user (zoom, navigation, parameters)
@@ -21,6 +22,10 @@ class Controller {
             start: 0,
             zoomedFromFrame: -1
         });
+
+        // Loading variables
+        this.framesBeingLoaded = 0;
+        this.clickedWhileLoading = false;
 
         Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
@@ -80,6 +85,37 @@ class Controller {
             this.visibleFramesInfo = this.visibleFramesInfo.slice(0, rowId+1);
 
             if ( !frameIsZoomed ) {
+                // Get frame object
+                let frameObject = this.getFrameById(this.getRowById(rowId), frameId);
+
+                // If the frame's child frames have not been loaded, request them
+                if ( frameObject.childFrames === null ) {
+                    
+                    let childFrames = Loader.ParseRealTest1(); // TODO: Replace with request
+                    this.framesBeingLoaded++;
+
+                    // TODO: Replace with request callback -> This adds fake delay
+                    setTimeout(() => {
+                        // Set frame's child frames
+                        frameObject.childFrames = childFrames;
+                        this.framesBeingLoaded--;
+
+                        if ( this.framesBeingLoaded === 0 && !this.clickedWhileLoading) {
+                            // Add a new row
+                            this.visibleFramesInfo.push({
+                                start: 0,
+                                zoomedFromFrame: frameId
+                            });
+
+                            Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
+                        }
+                    }, 1000);
+
+                    return;
+                }
+                
+                this.clickedWhileLoading = this.framesBeingLoaded > 0;
+
                 // Add a new row
                 this.visibleFramesInfo.push({
                     start: 0,
@@ -109,7 +145,12 @@ class Controller {
         Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
     }
 
-    getTotalNumberFramesInRow(rowId) {
+
+    getFrameById(row, frameId) {
+        return row[frameId];
+    }
+
+    getRowById(rowId) {
         // Loop Visible Frames Info
         let row = null;
         let i = 0;
@@ -121,7 +162,11 @@ class Controller {
             else row = row[info.zoomedFromFrame].childFrames; // Access the element that got zoomed from the previous row
             i++;
         }
-        return row.length;
+        return row;
+    }
+
+    getTotalNumberFramesInRow(rowId) {
+        return this.getRowById(rowId).length;
     }
 
 
