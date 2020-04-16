@@ -90,9 +90,11 @@ class Loader {
 
     /** Send request to server */
     static SendRequest() {
-        axios.post(SERVER_URL + '/storyboard/3', {
+        axios({
+            method: 'post',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            params: {
+            url: SERVER_URL + '/storyboard/3',
+            data: {
                 parameters: {
                     "translation": {
                         "delta": 1,
@@ -110,12 +112,12 @@ class Loader {
                     }
                 }
             }
-          },)
+          })
           .then(function (response) {
-            console.log(response);
+              console.log(response);
           })
           .catch(function (error) {
-            console.log(error);
+              console.log(error);
           });
     }
 }

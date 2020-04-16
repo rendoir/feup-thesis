@@ -5,7 +5,10 @@
     "watch": "yarn run watch-js & yarn run watch-css",
     "build-js": "browserify js/main.js | uglifyjs -mc > dist/bundle.js",
     "build-css": "node-sass css/style.scss dist/style.css",
-    "build": "yarn run build-js | yarn run build-css"
+    "build": "yarn run build-js | yarn run build-css",
+    "server": "http-server --cors --port=8081",
+    "start": "yarn run build && yarn run server",
+    "dev": "yarn run watch | yarn run server"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
@@ -13,6 +16,6 @@
     "bootstrap": "^4.4.1",
     "jquery": "^3.4.1",
     "popper.js": "^1.16.1",
-    "three": "^0.113.2"
+    "three": "^0.115.0"
   }
 }

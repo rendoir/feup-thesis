@@ -3,9 +3,9 @@
 
 
 "@fortawesome/fontawesome-free@^5.12.1":
-  version "5.12.1"
-  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.12.1.tgz#2a98fea9fbb8a606ddc79a4680034e9d5591c550"
-  integrity sha512-ZtjIIFplxncqxvogq148C3hBLQE+W3iJ8E4UvJ09zIJUgzwLcROsWwFDErVSXY2Plzao5J9KUYNHKHMEUYDMKw==
+  version "5.13.0"
+  resolved "https://registry.yarnpkg.com/@fortawesome/fontawesome-free/-/fontawesome-free-5.13.0.tgz#fcb113d1aca4b471b709e8c9c168674fbd6e06d9"
+  integrity sha512-xKOeQEl5O47GPZYIMToj6uuA2syyFlq9EMSl2ui0uytjY9xbe8XS0pexNWmxrdcCyNGyDmLyYw5FtKsalBUeOg==
 
 axios@^0.19.2:
   version "0.19.2"
@@ -34,9 +34,9 @@ follow-redirects@1.5.10:
     debug "=3.1.0"
 
 jquery@^3.4.1:
-  version "3.4.1"
-  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.4.1.tgz#714f1f8d9dde4bdfa55764ba37ef214630d80ef2"
-  integrity sha512-36+AdBzCL+y6qjw5Tx7HgzeGCzC81MDDgaUP8ld2zhx58HdqXGoBd+tHdrBMiyjGQs0Hxs/MLZTu/eHNJJuWPw==
+  version "3.5.0"
+  resolved "https://registry.yarnpkg.com/jquery/-/jquery-3.5.0.tgz#9980b97d9e4194611c36530e7dc46a58d7340fc9"
+  integrity sha512-Xb7SVYMvygPxbFMpTFQiHh1J7HClEaThguL15N/Gg37Lri/qKyhRGZYzHRyLH8Stq3Aow0LsHO2O2ci86fCrNQ==
 
 ms@2.0.0:
   version "2.0.0"
@@ -48,7 +48,7 @@ popper.js@^1.16.1:
   resolved "https://registry.yarnpkg.com/popper.js/-/popper.js-1.16.1.tgz#2a223cb3dc7b6213d740e40372be40de43e65b1b"
   integrity sha512-Wb4p1J4zyFTbM+u6WuO4XstYx4Ky9Cewe4DWrel7B0w6VVICvPwdOpotjzcf6eD8TsckVnIMNONQyPIUFOUbCQ==
 
-three@^0.113.2:
-  version "0.113.2"
-  resolved "https://registry.yarnpkg.com/three/-/three-0.113.2.tgz#04791d491fe4359330f9dbe7b767db18bfb35d67"
-  integrity sha512-x3vrKW41/UtbWbWduWKGlfIc043SvHWr3YltehYq+UGb9YglQ2oztNGvl2eut05JtNSmP11Mh3t6Xak5/0e+Fg==
+three@^0.115.0:
+  version "0.115.0"
+  resolved "https://registry.yarnpkg.com/three/-/three-0.115.0.tgz#540d800c381b9da2334c024f0fbe4d23f84eb05e"
+  integrity sha512-mAV2Ky3RdcbdSbR9capI+tKLvRldWYxd4151PZTT/o7+U2jh9Is3a4KmnYwzyUAhB2ZA3pXSgCd2DOY4Tj5kow==
