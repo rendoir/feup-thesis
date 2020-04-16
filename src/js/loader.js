@@ -2,6 +2,9 @@ const THREE = require('three');
 const Frame = require('./frame');
 const { Object, ObjectState } = require('./object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('./transformation');
+const axios = require('axios');
+
+const SERVER_URL = "http://127.0.0.1:8080";
 
 class Loader {
     static LoadFramesDemo1(storyboard) {
@@ -85,6 +88,36 @@ class Loader {
         return object;
     }
 
+    /** Send request to server */
+    static SendRequest() {
+        axios.post(SERVER_URL + '/storyboard/3', {
+            headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
+            params: {
+                parameters: {
+                    "translation": {
+                        "delta": 1,
+                        "directedAcc": 3, 
+                        "absoluteAcc": 10
+                    },
+                    "rotation": {
+                        "delta": 0.05,
+                        "directedAcc": 0.3, 
+                        "absoluteAcc": 45
+                    },
+                    "scale": {
+                        "delta": 0.1,
+                        "directedAcc": 0.3
+                    }
+                }
+            }
+          },)
+          .then(function (response) {
+            console.log(response);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
+    }
 }
 
 module.exports = Loader;
