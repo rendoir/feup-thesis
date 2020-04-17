@@ -1,10 +1,13 @@
 const THREE = require('three');
+const axios = require('axios');
+
 const Frame = require('./frame');
 const { Object, ObjectState } = require('./object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('./transformation');
-const axios = require('axios');
+const Settings = require('./settings');
 
 const SERVER_URL = "http://127.0.0.1:8080";
+const DATASET_ID = "3";
 
 class Loader {
     static LoadFramesDemo1(storyboard) {
@@ -89,26 +92,29 @@ class Loader {
     }
 
     /** Send request to server */
-    static SendRequest() {
+    static SendRequest(depth = 0, initialTimestamp = null, finalTimestamp = null) {
+        let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
+
         axios({
             method: 'post',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            url: SERVER_URL + '/storyboard/3',
+            url: SERVER_URL + '/storyboard/' + DATASET_ID,
             data: {
                 parameters: {
                     "translation": {
-                        "delta": 1,
-                        "directedAcc": 3, 
-                        "absoluteAcc": 10
+                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
+                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
+                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
                     },
                     "rotation": {
-                        "delta": 0.05,
-                        "directedAcc": 0.3, 
-                        "absoluteAcc": 45
+                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
+                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
+                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
                     },
                     "scale": {
-                        "delta": 0.1,
-                        "directedAcc": 0.3
+                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
+                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
+                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
                     }
                 }
             }
@@ -119,6 +125,12 @@ class Loader {
           .catch(function (error) {
               console.log(error);
           });
+    }
+
+    static LinearMultiplier(value, mult, depth) {
+        if ( value === NaN ) 
+            return null;
+        return value + value * mult * depth;
     }
 }
 

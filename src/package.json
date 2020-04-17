@@ -8,7 +8,7 @@
     "build": "yarn run build-js | yarn run build-css",
     "server": "http-server --cors --port=8081",
     "start": "yarn run build && yarn run server",
-    "dev": "yarn run watch | yarn run server"
+    "dev": "yarn run watch & yarn run server"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",

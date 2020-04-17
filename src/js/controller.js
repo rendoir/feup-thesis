@@ -91,7 +91,7 @@ class Controller {
                 // If the frame's child frames have not been loaded, request them
                 if ( frameObject.childFrames === null ) {
                     
-                    Loader.SendRequest();
+                    Loader.SendRequest(rowId);
                     let childFrames = Loader.ParseRealTest1(); // TODO: Replace with request
                     this.framesBeingLoaded++;
 

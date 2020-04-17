@@ -202,6 +202,10 @@ header {
         margin-bottom: 0;
     }
 
+    h6 {
+        margin-top: 1em;
+    }
+
     .form-line {
         display:flex;
         align-items:center;
@@ -211,6 +215,7 @@ header {
 
         select, input[type="number"], input[type="range"] {
             width: 40%;
+            height: 90%;
         }
 
         /* Range */

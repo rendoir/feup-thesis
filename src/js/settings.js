@@ -13,11 +13,25 @@ class SettingsManager {
         // Scenes group
         this.groups["scenes"] = new Group(rebuildScenes);
         this.groups["layout"] = new Group(updateLayout);
+        this.groups["events"] = new Group(updateParameters);
     }
 
     initSettings() {
         this.settings = {};
 
+        // Event settings
+        this.settings["s-translation-delta"] = new Setting(1, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-relative"] = new Setting(3, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-absolute"] = new Setting(10, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-delta"] = new Setting(0.05, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-relative"] = new Setting(0.3, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-absolute"] = new Setting(45, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-scale-delta"] = new Setting(0.1, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-scale-relative"] = new Setting(0.3, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-scale-absolute"] = new Setting(2, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-detail-multiplier"] = new Setting(1.5, [this.groups["events"]], updateFloat, updateNumberHTML);
+
+        // Scene settings
         this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-arrow"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-grid"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
@@ -25,6 +39,8 @@ class SettingsManager {
         this.settings["s-simplification"] = new Setting(false, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-intermediate-states"] = new Setting(-1, [this.groups["scenes"]], updateNumber, updateNumberHTML);
         this.settings["s-color"] = new Setting(0, [this.groups["scenes"]], updateNumber, updateRangeHTML);
+
+        // Layout settings
         this.settings["s-description"] = new Setting(true, [this.groups["layout"]], updateSwitch, updateSwitchHTML);
         this.settings["s-hierarchy"] = new Setting("fill", [], updateSelect, updateSelectHTML);
     }
@@ -124,6 +140,10 @@ function updateLayout() {
     Renderer.instance.update();
 }
 
+function updateParameters() {
+    console.error("updateParameters: function not implemented");
+}
+
 // Settings actions
 function updateSwitch(input) {
     let changed = this.value != input.checked;
@@ -148,6 +168,12 @@ function updateSelectHTML(input) {
 function updateNumber(input) {
     let changed = this.value != input.value;
     this.value = parseInt(input.value);
+    return changed;
+}
+
+function updateFloat(input) {
+    let changed = this.value != input.value;
+    this.value = parseFloat(input.value);
     return changed;
 }
 
