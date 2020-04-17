@@ -91,8 +91,13 @@ class Controller {
                 // If the frame's child frames have not been loaded, request them
                 if ( frameObject.childFrames === null ) {
                     
-                    Loader.SendRequest(rowId);
-                    let childFrames = Loader.ParseRealTest1(); // TODO: Replace with request
+                    Loader.SendRequest((frames) => {
+                            console.log(frames);
+                        }, 
+                        (error) => {
+                            console.error(error);
+                        }, rowId);
+                    let childFrames = []; // TODO: Replace with request
                     this.framesBeingLoaded++;
 
                     // TODO: Replace with request callback -> This adds fake delay

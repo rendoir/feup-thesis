@@ -177,7 +177,8 @@ class Transformation {
             if ( this.shouldSimplifyVertices ) this.simplifyVertices();
 
             // Assume same number of vertices and same order
-            for (let i = 0; i < initialState.vertices.length; i++) {
+            let nVertices = Math.min(initialState.vertices.length, finalState.vertices.length);
+            for (let i = 0; i < nVertices; i++) {
                 const initialVertex = initialState.vertices[i];
                 const finalVertex = finalState.vertices[i];
 
@@ -350,7 +351,8 @@ class Orientation extends Transformation {
             let sceneScale = this.getMaxSceneBoxSize();
 
             // Loop all vertices
-            for (let i = 0; i < initialState.vertices.length; i++) {   
+            let nVertices = Math.min(initialState.vertices.length, finalState.vertices.length);
+            for (let i = 0; i < nVertices; i++) {   
                 if ( this.shouldSimplifyVertices && !initialState.vertices[i].shouldBeVisible ) continue;
 
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);
@@ -441,7 +443,8 @@ class Rotation extends Transformation {
             let center = new THREE.Vector3(this.pivot.x, this.pivot.y, 0);
 
             // Loop all vertices
-            for (let i = 0; i < initialState.vertices.length; i++) {                
+            let nVertices = Math.min(initialState.vertices.length, finalState.vertices.length);
+            for (let i = 0; i < nVertices; i++) {                
                 if ( this.shouldSimplifyVertices && !initialState.vertices[i].shouldBeVisible ) continue;
 
                 let start = new THREE.Vector3(initialState.vertices[i].x, initialState.vertices[i].y, 0);

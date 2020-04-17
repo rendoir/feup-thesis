@@ -29,7 +29,7 @@ class SettingsManager {
         this.settings["s-scale-delta"] = new Setting(0.1, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-scale-relative"] = new Setting(0.3, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-scale-absolute"] = new Setting(2, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-detail-multiplier"] = new Setting(1.5, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
 
         // Scene settings
         this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);

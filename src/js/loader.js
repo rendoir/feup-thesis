@@ -10,6 +10,9 @@ const SERVER_URL = "http://127.0.0.1:8080";
 const DATASET_ID = "3";
 
 class Loader {
+
+    /** --------------- TEST CASES --------------- */
+
     static LoadFramesDemo1(storyboard) {
         const frames = require('./demos/demo1');
         storyboard.setFrames(frames);
@@ -25,6 +28,16 @@ class Loader {
         return Loader.ParseJson(json);
     }
 
+    /** ------------------------------------------ */
+
+    static LoadDataset(storyboard) {
+        Loader.SendRequest((frames) => {
+            storyboard.setFrames(frames);
+        }, (error) => {
+           console.error(error); 
+        });
+    }
+
     static ParseJson(json) {
         let frames = [];
         //console.log(json);
@@ -33,9 +46,11 @@ class Loader {
             let object = Loader.ParsePhenomena(jsonFrame.phenomena);
             let initialTimestamp = object.states[0].timestamp;
             let finalTimestamp = object.states[object.states.length-1].timestamp;
-            let frame = new Frame(object, transformation, initialTimestamp, finalTimestamp);
-            frames.push(frame);
-            //console.log(frame);
+            if ( transformation !== undefined && object !== undefined ) {
+                let frame = new Frame(object, transformation, initialTimestamp, finalTimestamp);
+                frames.push(frame);
+                //console.log(frame);
+            }
         });
         return frames;
     }
@@ -47,15 +62,15 @@ class Loader {
         events.forEach(event => {
             switch (event.type) {
                 case "TRANSLATION":
-                    transformations.push(new Translation(new THREE.Vector2(event.triggerValue, event.triggerValue))); // TODO: Update when it's a vector
+                    transformations.push(new Translation(new THREE.Vector2(event.trigger.transformation[0], event.trigger.transformation[1])));
                     break;
 
                 case "UNIFORM_SCALE":
-                    transformations.push(new Scale(new THREE.Vector2(event.triggerValue, event.triggerValue))); // TODO: Update when it's a vector
+                    transformations.push(new Scale(new THREE.Vector2(event.trigger.transformation[0], event.trigger.transformation[1])));
                     break;
 
                 case "ROTATION":
-                    transformations.push(new Orientation(event.triggerValue));
+                    transformations.push(new Orientation(event.trigger.transformation));
                     break;
             
                 default:
@@ -68,7 +83,6 @@ class Loader {
         if( transformations.length > 1 )
             transformation = new Multiple(transformations);
         else transformation = transformations[0];
-
         return transformation;
     }
 
@@ -92,7 +106,7 @@ class Loader {
     }
 
     /** Send request to server */
-    static SendRequest(depth = 0, initialTimestamp = null, finalTimestamp = null) {
+    static SendRequest(successCallback, errorCallback, depth = 0, initialTimestamp = null, finalTimestamp = null) {
         let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
 
         axios({
@@ -121,12 +135,16 @@ class Loader {
           })
           .then(function (response) {
               console.log(response);
+              let frames = Loader.ParseJson(response.data);
+              successCallback(frames);
           })
           .catch(function (error) {
-              console.log(error);
+              console.error(error);
+              errorCallback(error);
           });
     }
 
+    // BUG: VALUES ARE INCREASING BUT SHOULD DECREASE 
     static LinearMultiplier(value, mult, depth) {
         if ( value === NaN ) 
             return null;

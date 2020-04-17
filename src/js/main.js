@@ -4,5 +4,6 @@ const Renderer = require('./renderer');
 const Loader = require('./loader');
 const SettingsManager = require('./settings');
 
-Loader.LoadRealTest1(Storyboard.instance);
-setTimeout(function(){ Loader.LoadFramesDemo1(Storyboard.instance); }, 3000);
+//Loader.LoadRealTest1(Storyboard.instance);
+//setTimeout(function(){ Loader.LoadFramesDemo1(Storyboard.instance); }, 3000);
+Loader.LoadDataset(Storyboard.instance);
