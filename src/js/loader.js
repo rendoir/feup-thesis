@@ -109,6 +109,7 @@ class Loader {
     static SendRequest(successCallback, errorCallback, depth = 0, initialTimestamp = null, finalTimestamp = null) {
         let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
 
+        // TODO: USE INITIAL AND FINAL TIMESTAMPS WHEN AVAILABLE
         axios({
             method: 'post',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},

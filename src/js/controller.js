@@ -91,31 +91,29 @@ class Controller {
                 // If the frame's child frames have not been loaded, request them
                 if ( frameObject.childFrames === null ) {
                     
-                    Loader.SendRequest((frames) => {
-                            console.log(frames);
+                    this.framesBeingLoaded++;
+                    Loader.SendRequest((childFrames) => {
+                            console.log(childFrames);
+                            
+                            // Set frame's child frames
+                            frameObject.childFrames = childFrames;
+                            this.framesBeingLoaded--;
+
+                            if ( this.framesBeingLoaded === 0 && !this.clickedWhileLoading ) {
+                                // Add a new row
+                                this.visibleFramesInfo.push({
+                                    start: 0,
+                                    zoomedFromFrame: frameId
+                                });
+
+                                Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
+                            }
                         }, 
                         (error) => {
                             console.error(error);
+
+                            this.framesBeingLoaded--;
                         }, rowId);
-                    let childFrames = []; // TODO: Replace with request
-                    this.framesBeingLoaded++;
-
-                    // TODO: Replace with request callback -> This adds fake delay
-                    setTimeout(() => {
-                        // Set frame's child frames
-                        frameObject.childFrames = childFrames;
-                        this.framesBeingLoaded--;
-
-                        if ( this.framesBeingLoaded === 0 && !this.clickedWhileLoading) {
-                            // Add a new row
-                            this.visibleFramesInfo.push({
-                                start: 0,
-                                zoomedFromFrame: frameId
-                            });
-
-                            Renderer.instance.setVisibleFramesInfo(this.visibleFramesInfo);
-                        }
-                    }, 1000);
 
                     return;
                 }
