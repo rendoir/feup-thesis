@@ -117,19 +117,19 @@ class Loader {
             data: {
                 parameters: {
                     "translation": {
-                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
-                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
-                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
+                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
+                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
+                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
                     },
                     "rotation": {
-                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
-                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
-                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
+                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
+                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
+                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
                     },
                     "scale": {
-                        "delta": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
-                        "directedAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
-                        "absoluteAcc": Loader.LinearMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
+                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
+                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
+                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
                     }
                 }
             }
@@ -145,11 +145,10 @@ class Loader {
           });
     }
 
-    // BUG: VALUES ARE INCREASING BUT SHOULD DECREASE 
-    static LinearMultiplier(value, mult, depth) {
+    static ApplyMultiplier(value, mult, depth) {
         if ( value === NaN ) 
             return null;
-        return value + value * mult * depth;
+        return value * Math.pow(mult, depth);
     }
 }
 

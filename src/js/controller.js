@@ -113,7 +113,7 @@ class Controller {
                             console.error(error);
 
                             this.framesBeingLoaded--;
-                        }, rowId);
+                        }, rowId+1);
 
                     return;
                 }
