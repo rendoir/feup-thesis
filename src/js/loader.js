@@ -109,38 +109,41 @@ class Loader {
     static SendRequest(successCallback, errorCallback, depth = 0, initialTimestamp = null, finalTimestamp = null) {
         let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
 
-        // TODO: USE INITIAL AND FINAL TIMESTAMPS WHEN AVAILABLE
         axios({
             method: 'post',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
             url: SERVER_URL + '/storyboard/' + DATASET_ID,
+            params: {
+                initialTimestamp: initialTimestamp,
+                finalTimestamp: finalTimestamp
+            },
             data: {
                 parameters: {
-                    "translation": {
-                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
-                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
-                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
+                    translation: {
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
                     },
-                    "rotation": {
-                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
-                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
-                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
+                    rotation: {
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
                     },
-                    "scale": {
-                        "delta": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
-                        "directedAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
-                        "absoluteAcc": Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
+                    scale: {
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
                     }
                 }
             }
           })
           .then(function (response) {
-              console.log(response);
+              //console.log(response);
               let frames = Loader.ParseJson(response.data);
               successCallback(frames);
           })
           .catch(function (error) {
-              console.error(error);
+              //console.error(error);
               errorCallback(error);
           });
     }

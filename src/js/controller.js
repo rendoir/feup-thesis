@@ -93,7 +93,7 @@ class Controller {
                     
                     this.framesBeingLoaded++;
                     Loader.SendRequest((childFrames) => {
-                            console.log(childFrames);
+                            //console.log(childFrames);
                             
                             // Set frame's child frames
                             frameObject.childFrames = childFrames;
@@ -113,7 +113,7 @@ class Controller {
                             console.error(error);
 
                             this.framesBeingLoaded--;
-                        }, rowId+1);
+                        }, rowId+1, frameObject.initialTimestamp, frameObject.finalTimestamp);
 
                     return;
                 }
