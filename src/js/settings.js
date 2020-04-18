@@ -1,4 +1,5 @@
 const Renderer = require('./renderer');
+const Loader = require('./loader');
 
 class SettingsManager {
     constructor() {
@@ -11,9 +12,9 @@ class SettingsManager {
         this.groups = {};
 
         // Scenes group
+        this.groups["events"] = new Group(updateParameters);
         this.groups["scenes"] = new Group(rebuildScenes);
         this.groups["layout"] = new Group(updateLayout);
-        this.groups["events"] = new Group(updateParameters);
     }
 
     initSettings() {
@@ -72,12 +73,16 @@ class SettingsManager {
             }
         }
 
-        Object.values(this.groups).forEach(group => {
+        for (let groupKey in this.groups) { 
+            let group = this.groups[groupKey]; 
+
             if ( group.needsUpdate ) {
-                group.update();
+                let shouldStop = group.update();
                 group.needsUpdate = false;
+                if ( shouldStop )
+                    break;
             }
-        });
+        }
     }
 
     onModalOpen(event) {
@@ -127,21 +132,24 @@ class Group {
     }
 
     update() {
-        this.updateFunction.call();
+        return this.updateFunction.call();
     }
 }
 
 // Group actions
 function rebuildScenes() {
     Renderer.instance.rebuildScenes();
+    return false;
 }
 
 function updateLayout() {
     Renderer.instance.update();
+    return false;
 }
 
 function updateParameters() {
-    console.error("updateParameters: function not implemented");
+    Loader.LoadDataset();
+    return true;
 }
 
 // Settings actions

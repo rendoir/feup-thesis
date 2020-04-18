@@ -1,6 +1,7 @@
 const THREE = require('three');
 const axios = require('axios');
 
+const Storyboard = require('./storyboard');
 const Frame = require('./frame');
 const { Object, ObjectState } = require('./object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('./transformation');
@@ -13,14 +14,14 @@ class Loader {
 
     /** --------------- TEST CASES --------------- */
 
-    static LoadFramesDemo1(storyboard) {
+    static LoadFramesDemo1() {
         const frames = require('./demos/demo1');
-        storyboard.setFrames(frames);
+        Storyboard.instance.setFrames(frames);
     }
 
-    static LoadRealTest1(storyboard) {
+    static LoadRealTest1() {
         let frames = Loader.ParseRealTest1();
-        storyboard.setFrames(frames);
+        Storyboard.instance.setFrames(frames);
     }
 
     static ParseRealTest1() {
@@ -30,10 +31,10 @@ class Loader {
 
     /** ------------------------------------------ */
 
-    static LoadDataset(storyboard) {
+    static LoadDataset() {
         // Get initial set of frames
         Loader.SendRequest((frames) => {
-            storyboard.setFrames(frames);
+            Storyboard.instance.setFrames(frames);
         }, (error) => {
            console.error(error); 
         });
