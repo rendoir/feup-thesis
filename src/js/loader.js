@@ -31,11 +31,15 @@ class Loader {
     /** ------------------------------------------ */
 
     static LoadDataset(storyboard) {
+        // Get initial set of frames
         Loader.SendRequest((frames) => {
             storyboard.setFrames(frames);
         }, (error) => {
            console.error(error); 
         });
+
+        // Get metadata
+        Loader.HandleMetadataRequest();
     }
 
     static ParseJson(json) {
@@ -152,6 +156,22 @@ class Loader {
         if ( value === NaN ) 
             return null;
         return value * Math.pow(mult, depth);
+    }
+
+    static HandleMetadataRequest() {
+        axios({
+            method: 'get',
+            headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
+            url: SERVER_URL + '/storyboard/metadata/' + DATASET_ID,
+          })
+          .then(function (response) {
+              //console.log(response);
+              let name = response.data.name;
+              document.getElementById("dataset-name").innerHTML = name;
+          })
+          .catch(function (error) {
+              console.error(error);
+          });
     }
 }
 
