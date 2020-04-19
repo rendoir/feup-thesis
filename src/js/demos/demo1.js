@@ -219,59 +219,111 @@ let multiple = new Multiple([new Translation(new THREE.Vector2(50, 100)), new Or
 
 /* ----- FRAMES ----- */
 let frames = [];
+let timeStack = [];
+let divisionStack = [];
 
-let frame0_0 = new Frame(objectScale, scale, timestamp, stepTime());                    frames.push(frame0_0);
-let frame0_1 = new Frame(objectOrientation, orientation, timestamp, stepTime());        frames.push(frame0_1);
-let frame0_2 = new Frame(objectTranslation, translation, timestamp, stepTime());        frames.push(frame0_2);
-let frame0_3 = new Frame(objectUnknown, unknown, timestamp, stepTime());                frames.push(frame0_3);
-let frame0_4 = new Frame(objectImmutability, immutability, timestamp, stepTime());      frames.push(frame0_4);
-let frame0_5 = new Frame(objectMultiple, multiple, timestamp, stepTime());              frames.push(frame0_5);
+let timeDuration = getRandomDuration();
+let divisions = getRandomDivisions(timeDuration, 6);
 
-let frame1_0 = new Frame(objectOrientation, orientation, timestamp, stepTime());        frame0_3.addChildFrame(frame1_0);
-let frame1_1 = new Frame(objectScale, scale, timestamp, stepTime());                    frame0_3.addChildFrame(frame1_1);
-let frame1_2 = new Frame(objectRotation, rotation, timestamp, stepTime());              frame0_3.addChildFrame(frame1_2);
-let frame1_3 = new Frame(objectTranslation, translation, timestamp, stepTime());        frame0_3.addChildFrame(frame1_3);
+let frame0_0 = new Frame(objectScale, scale, timestamp, stepTime(divisions[0]));                    frames.push(frame0_0);
+let frame0_1 = new Frame(objectOrientation, orientation, timestamp, stepTime(divisions[1]));        frames.push(frame0_1);
+let frame0_2 = new Frame(objectTranslation, translation, timestamp, stepTime(divisions[2]));        frames.push(frame0_2);
 
-let frame1_4 = new Frame(objectRotation, rotation, timestamp, stepTime());              frame0_2.addChildFrame(frame1_4);
-let frame1_5 = new Frame(objectScale, scale, timestamp, stepTime());                    frame0_2.addChildFrame(frame1_5);
-let frame1_6 = new Frame(objectTranslation, translation, timestamp, stepTime());        frame0_2.addChildFrame(frame1_6);
-let frame1_7 = new Frame(objectOrientation, orientation, timestamp, stepTime());        frame0_2.addChildFrame(frame1_7);
+    onDepthStart(2, 4);
+    let frame1_4 = new Frame(objectRotation, rotation, timestamp, stepTime(divisions[0]));              frame0_2.addChildFrame(frame1_4);
+    let frame1_5 = new Frame(objectScale, scale, timestamp, stepTime(divisions[1]));                    frame0_2.addChildFrame(frame1_5);
+    let frame1_6 = new Frame(objectTranslation, translation, timestamp, stepTime(divisions[2]));        frame0_2.addChildFrame(frame1_6);
+    let frame1_7 = new Frame(objectOrientation, orientation, timestamp, stepTime(divisions[3]));        frame0_2.addChildFrame(frame1_7);
+    onDepthEnd();
 
-let frame2_0 = new Frame(objectTranslation, translation, timestamp, stepTime());        frame1_0.addChildFrame(frame2_0);
-let frame2_1 = new Frame(objectScale, scale, timestamp, stepTime());                    frame1_0.addChildFrame(frame2_1);
-let frame2_2 = new Frame(objectOrientation, orientation, timestamp, stepTime());        frame1_0.addChildFrame(frame2_2);
+let frame0_3 = new Frame(objectUnknown, unknown, timestamp, stepTime(divisions[3]));                frames.push(frame0_3);
 
-let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime());        frame2_0.addChildFrame(frame3_0);
+    onDepthStart(3, 4);
+    let frame1_0 = new Frame(objectOrientation, orientation, timestamp, stepTime(divisions[0]));        frame0_3.addChildFrame(frame1_0);
+
+        onDepthStart(0, 3);
+        let frame2_0 = new Frame(objectTranslation, translation, timestamp, stepTime(divisions[0]));        frame1_0.addChildFrame(frame2_0);
+
+            onDepthStart(0, 1);
+            let frame3_0 = new Frame(objectTranslation, translation, timestamp, stepTime(divisions[0]));        frame2_0.addChildFrame(frame3_0);
+            onDepthEnd();
+
+        let frame2_1 = new Frame(objectScale, scale, timestamp, stepTime(divisions[1]));                    frame1_0.addChildFrame(frame2_1);
+        let frame2_2 = new Frame(objectOrientation, orientation, timestamp, stepTime(divisions[2]));        frame1_0.addChildFrame(frame2_2);
+        onDepthEnd();
+
+    let frame1_1 = new Frame(objectScale, scale, timestamp, stepTime(divisions[1]));                    frame0_3.addChildFrame(frame1_1);
+    let frame1_2 = new Frame(objectRotation, rotation, timestamp, stepTime(divisions[2]));              frame0_3.addChildFrame(frame1_2);
+    let frame1_3 = new Frame(objectTranslation, translation, timestamp, stepTime(divisions[3]));        frame0_3.addChildFrame(frame1_3);
+    onDepthEnd();
+
+let frame0_4 = new Frame(objectImmutability, immutability, timestamp, stepTime(divisions[4]));      frames.push(frame0_4);
+let frame0_5 = new Frame(objectMultiple, multiple, timestamp, stepTime(divisions[5]));              frames.push(frame0_5);
 
 
-function stepTime() {
+function onDepthStart(index, nFrames) {
+    timeStack.push(timestamp);
+    divisionStack.push(divisions.slice());
+    timestamp -= divisions[index];
+    divisions = getRandomDivisions(divisions[index], nFrames);
+}
+
+
+function onDepthEnd() {
+    timestamp = timeStack.pop();
+    divisions = divisionStack.pop();
+}
+
+
+function getRandomDuration() {
     // Step a few milliseconds
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*2 + Utils.Milliseconds.MILLISECOND);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*14 + Utils.Milliseconds.MILLISECOND*4);
 
     // Step a few deciseconds
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*20 + Utils.Milliseconds.MILLISECOND);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*140 + Utils.Milliseconds.MILLISECOND*50);
 
     // Step a few centiseconds
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*200 + Utils.Milliseconds.MILLISECOND*10);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.MILLISECOND*1400 + Utils.Milliseconds.MILLISECOND*500);
 
     // Step a few seconds
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.SECOND*5 + Utils.Milliseconds.SECOND/2);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.SECOND*110 + Utils.Milliseconds.SECOND*5);
 
     // Step a few minutes
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MINUTE*5 + Utils.Milliseconds.MINUTE/2);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.MINUTE*110 + Utils.Milliseconds.MINUTE*5);
 
     // Step a few hours
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.HOUR*3 + Utils.Milliseconds.HOUR/2);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.HOUR*42 + Utils.Milliseconds.HOUR*5);
 
     // Step a few days
-    timestamp += Math.ceil(Math.random() * Utils.Milliseconds.DAY*5 + Utils.Milliseconds.DAY/2);
+    return Math.ceil(Math.random() * Utils.Milliseconds.DAY*55 + Utils.Milliseconds.DAY*5);
 
     // Step a few months
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.MONTH*3 + Utils.Milliseconds.MONTH/2);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.MONTH*18 + Utils.Milliseconds.MONTH*5);
 
     // Step a few years
-    //timestamp += Math.ceil(Math.random() * Utils.Milliseconds.YEAR*5 + Utils.Milliseconds.YEAR/2);
+    //return Math.ceil(Math.random() * Utils.Milliseconds.YEAR*50 + Utils.Milliseconds.YEAR*5);
+}
 
+
+function getRandomDivisions(timeDuration, numberFrames) {
+    let randomDurations = [];
+    let sum = 0.0;
+    for (let i = 0; i < numberFrames; i++) {
+        let random = Math.random() * 0.9 + 0.1;
+        sum += random;
+        randomDurations.push(random);
+    }
+    let newSum = 0.0;
+    for (let i = 0; i < numberFrames; i++) {
+        randomDurations[i] = Math.ceil(randomDurations[i] * timeDuration / sum);
+        newSum += randomDurations[i];
+    }
+    return randomDurations;
+}
+
+
+function stepTime(div) {
+    timestamp += div;
     return timestamp;
 }
 

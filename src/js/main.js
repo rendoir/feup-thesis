@@ -5,5 +5,5 @@ const Loader = require('./loader');
 const SettingsManager = require('./settings');
 
 //Loader.LoadRealTest1();
-//setTimeout(function(){ Loader.LoadFramesDemo1(); }, 3000);
+//Loader.LoadFramesDemo1();
 Loader.LoadDataset();

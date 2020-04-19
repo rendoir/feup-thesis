@@ -86,6 +86,7 @@ canvas {
 
 /* Timelines */
 .frame-timeline {
+    display: flex;
     height: 25px;
 
     .frame-timeline-item {
