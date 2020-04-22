@@ -8,7 +8,6 @@ const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotati
 const Settings = require('./settings');
 
 const SERVER_URL = "http://127.0.0.1:8080";
-const DATASET_ID = "3";
 
 class Loader {
 
@@ -112,12 +111,14 @@ class Loader {
 
     /** Send request to server */
     static SendRequest(successCallback, errorCallback, depth = 0, initialTimestamp = null, finalTimestamp = null) {
+        if ( Settings.instance.datasetKey === null ) return;
+        
         let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
 
         axios({
             method: 'post',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            url: SERVER_URL + '/storyboard/' + DATASET_ID,
+            url: SERVER_URL + '/storyboard/' + Settings.instance.datasetKey,
             params: {
                 initialTimestamp: initialTimestamp,
                 finalTimestamp: finalTimestamp
@@ -160,10 +161,12 @@ class Loader {
     }
 
     static HandleMetadataRequest() {
+        if ( Settings.instance.datasetKey === null ) return;
+
         axios({
             method: 'get',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            url: SERVER_URL + '/storyboard/metadata/' + DATASET_ID,
+            url: SERVER_URL + '/storyboard/metadata/' + Settings.instance.datasetKey,
           })
           .then(function (response) {
               //console.log(response);

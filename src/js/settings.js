@@ -6,6 +6,7 @@ class SettingsManager {
         this.initGroups();
         this.initSettings();
         this.initForm();
+        this.initDataset();
     }
 
     initGroups() {
@@ -58,6 +59,19 @@ class SettingsManager {
         this.openModalButton = document.getElementById("settings");
         this.openModalButton.addEventListener("click", (event) => {
             thisManager.onModalOpen(event);
+        });
+    }
+
+    initDataset() {
+        this.datasetKey = null;
+        let settingsInstance = this;
+        let datasetInput = document.getElementById("dataset-key");
+        datasetInput.addEventListener("change", (event) => {
+            let key = parseInt(event.target.value);
+            if ( !isNaN(key) && key !== settingsInstance.datasetKey ) {
+                settingsInstance.datasetKey = key;
+                Loader.LoadDataset();
+            }
         });
     }
 

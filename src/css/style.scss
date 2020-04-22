@@ -190,8 +190,18 @@ header {
         line-height: 3rem;
     }
 
+    h4:first-of-type {
+        margin-right: 0.5em;
+    }
+
     .btn-settings {
         vertical-align: middle;
+    }
+
+    input {
+        width: 4em !important;
+        display: inline-block !important;
+        margin-right: 0.5em;
     }
 }
 
@@ -213,6 +223,11 @@ header {
         justify-content: space-between;
         padding-left: 2.4em;
         padding-right: 2.4em;
+
+        label {
+            width: 60%;
+            line-height: 100%;
+        }
 
         select, input[type="number"], input[type="range"] {
             width: 40%;
