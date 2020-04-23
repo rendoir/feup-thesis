@@ -537,6 +537,10 @@ class Immutability extends Transformation {
         }
     }
 
+    _getColor(i, nStates) {
+        return new THREE.Color().setHSL(0, 0, 0.5);
+    }
+
     _getOpacity(i, nStates) {
         return 0.8;
     }
@@ -554,6 +558,10 @@ class Unknown extends Transformation {
         this.setupOnionSkinning();
         this.setupSceneCamera();
         this.setupGrid();
+    }
+
+    _getColor(i, nStates) {
+        return new THREE.Color().setHSL(0, 0, 0.5);
     }
 }
 
