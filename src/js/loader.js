@@ -13,19 +13,17 @@ class Loader {
 
     /** --------------- TEST CASES --------------- */
 
-    static LoadFramesDemo1() {
-        const frames = require('./demos/demo1');
+    static LoadFramesDemo(demoNr) {
+        let frames;
+        switch (demoNr) {
+            case 1:
+                frames = require('./demos/demo1');
+                break;
+            case 2:
+                frames = require('./demos/demo2');
+                break;
+        }
         Storyboard.instance.setFrames(frames);
-    }
-
-    static LoadRealTest1() {
-        let frames = Loader.ParseRealTest1();
-        Storyboard.instance.setFrames(frames);
-    }
-
-    static ParseRealTest1() {
-        const json = require('./demos/test1.json');
-        return Loader.ParseJson(json);
     }
 
     /** ------------------------------------------ */
