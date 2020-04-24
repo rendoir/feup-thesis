@@ -3,16 +3,25 @@ const THREE = require("three");
 const FONT_JSON = require('three/examples/fonts/helvetiker_regular.typeface.json');
 var FONT = null;
 
-const SIZE_SCALE = 0.03;
+const SIZE_SCALE = 0.025;
 const TEXT_COLOR = 0x808080;
+
+const MIN_DIVISIONS = 3;
+const MAX_DIVISIONS = 10;
+const DIV_MODULE = MAX_DIVISIONS - MIN_DIVISIONS + 1;
 
 let matLite = new THREE.MeshBasicMaterial( {
     color: TEXT_COLOR,
     side: THREE.DoubleSide
 } );
 
+function getDivisions(x) {
+    let orderMagnitude = Math.pow(10, Math.floor(Math.log10(x)));
+    return Math.floor(x / orderMagnitude) % DIV_MODULE + MIN_DIVISIONS;
+}
+
 class Grid extends THREE.Object3D {
-    constructor(size, divisions, center) {
+    constructor(size, center) {
         super();
 
         this.center = center;
@@ -22,6 +31,7 @@ class Grid extends THREE.Object3D {
         if( FONT == null )
             FONT = new THREE.Font( FONT_JSON );
      
+        let divisions = getDivisions(size);
         let step = size / divisions;
         let halfSize = size / 2;
     

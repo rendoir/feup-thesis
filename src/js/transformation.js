@@ -10,7 +10,6 @@ const MAPPING_DEPTH = -1;
 const GRID_DEPTH = -250;
 
 const CAMERA_PADDING = 0.25;
-const GRID_DIVISIONS = 3;
 
 /**
  * Abstract class for an object transformation in a frame
@@ -72,7 +71,7 @@ class Transformation {
         let boxSize = this.getMaxSceneBoxSize();
         let gridSize = boxSize + boxSize*CAMERA_PADDING*2;
         let gridCenter = new THREE.Vector3(center.x, this.shouldDisplayOverlay ? center.y - boxSize*CAMERA_PADDING/2 : center.y, GRID_DEPTH)
-        let grid = new Grid(gridSize, GRID_DIVISIONS, gridCenter);
+        let grid = new Grid(gridSize, gridCenter);
 
         this.scene.add(grid);
     }
