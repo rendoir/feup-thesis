@@ -111,7 +111,11 @@ class Loader {
     static SendRequest(successCallback, errorCallback, depth = 0, initialTimestamp = null, finalTimestamp = null) {
         if ( Settings.instance.datasetKey === null ) return;
         
-        let mult = Settings.instance.getSettingValue("s-detail-multiplier") || 0;
+        let multiplier = {
+            translation: Settings.instance.getSettingValue("s-translation-detail-multiplier") || 0,
+            rotation: Settings.instance.getSettingValue("s-orientation-detail-multiplier") || 0,
+            scale: Settings.instance.getSettingValue("s-scale-detail-multiplier") || 0
+        }
 
         axios({
             method: 'post',
@@ -124,19 +128,19 @@ class Loader {
             data: {
                 parameters: {
                     translation: {
-                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), mult, depth),
-                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), mult, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), mult, depth)
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), multiplier.translation, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), multiplier.translation, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), multiplier.translation, depth)
                     },
                     rotation: {
-                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), mult, depth),
-                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), mult, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), mult, depth)
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), multiplier.rotation, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), multiplier.rotation, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), multiplier.rotation, depth)
                     },
                     scale: {
-                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), mult, depth),
-                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), mult, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), mult, depth)
+                        delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), multiplier.scale, depth),
+                        directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), multiplier.scale, depth), 
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), multiplier.scale, depth)
                     }
                 }
             }
