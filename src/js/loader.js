@@ -69,7 +69,7 @@ class Loader {
                     break;
 
                 case "UNIFORM_SCALE":
-                    transformations.push(new Scale(new THREE.Vector2(event.trigger.transformation[0], event.trigger.transformation[1])));
+                    transformations.push(new Scale(new THREE.Vector2(event.trigger.transformation, event.trigger.transformation)));
                     break;
 
                 case "ROTATION":
