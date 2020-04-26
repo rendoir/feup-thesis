@@ -37,6 +37,9 @@ class SettingsManager {
         this.settings["s-scale-absolute"] = new Setting(2, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-scale-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
 
+        this.settings["s-immutability-threshold"] = new Setting(1000, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-immutability-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
+
         // Scene settings
         this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
         this.settings["s-arrow"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
@@ -192,14 +195,16 @@ function updateSelectHTML(input) {
 }
 
 function updateNumber(input) {
-    let changed = this.value != input.value;
-    this.value = parseInt(input.value);
+    let parsedValue = parseInt(input.value);
+    let changed = this.value != parsedValue && !(isNaN(this.value) && isNaN(parsedValue));
+    this.value = parsedValue;
     return changed;
 }
 
 function updateFloat(input) {
-    let changed = this.value != input.value;
-    this.value = parseFloat(input.value);
+    let parsedValue = parseFloat(input.value);
+    let changed = this.value != parsedValue && !(isNaN(this.value) && isNaN(parsedValue));
+    this.value = parsedValue;
     return changed;
 }
 

@@ -564,6 +564,25 @@ class Unknown extends Transformation {
     }
 }
 
+class Unimportant extends Transformation {
+    getName() { return "Unimportant" }
+
+    getDetails() { return "The object suffered unimportant transformations" }
+
+    getOverlayDetails() { return "Unimportant changes" }
+    
+    setupScene(scene, object) { 
+        super.setupScene(scene, object);
+        this.setupOnionSkinning();
+        this.setupSceneCamera();
+        this.setupGrid();
+    }
+
+    _getColor(i, nStates) {
+        return new THREE.Color().setHSL(0, 0, 0.5);
+    }
+}
+
 class Multiple extends Transformation {
     constructor(transformations) {
         super();
@@ -604,5 +623,6 @@ module.exports = {
     Scale : Scale,
     Immutability : Immutability,
     Unknown : Unknown,
+    Unimportant : Unimportant,
     Multiple : Multiple
 }

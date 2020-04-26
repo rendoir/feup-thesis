@@ -4,10 +4,11 @@ const axios = require('axios');
 const Storyboard = require('./storyboard');
 const Frame = require('./frame');
 const { Object, ObjectState } = require('./object');
-const { Translation, Orientation, Scale, Immutability, Unknown, Multiple, Rotation } = require('./transformation');
+const { Translation, Orientation, Scale, Immutability, Unknown, Unimportant, Multiple } = require('./transformation');
 const Settings = require('./settings');
 
-const SERVER_URL = "http://127.0.0.1:8080";
+//const SERVER_URL = "http://fctmost.inesctec.pt:80/stfx/";
+const SERVER_URL = "http://127.0.0.1:80/stfx/";
 
 class Loader {
 
@@ -74,8 +75,18 @@ class Loader {
                 case "ROTATION":
                     transformations.push(new Orientation(event.trigger.transformation));
                     break;
+
+                case "UNIMPORTANT":
+                    transformations.push(new Unimportant());
+                    break;
+
+                case "IMMUTABILITY":
+                    transformations.push(new Immutability());
+                    break;
             
+                case "UNKNOWN":
                 default:
+                    transformations.push(new Unknown());
                     break;
             }
         });
@@ -84,7 +95,10 @@ class Loader {
         let transformation;
         if( transformations.length > 1 )
             transformation = new Multiple(transformations);
-        else transformation = transformations[0];
+        else if ( transformations.length > 0 ) 
+            transformation = transformations[0];
+        else transformation = new Unknown();
+
         return transformation;
     }
 
@@ -114,8 +128,9 @@ class Loader {
         let multiplier = {
             translation: Settings.instance.getSettingValue("s-translation-detail-multiplier") || 0,
             rotation: Settings.instance.getSettingValue("s-orientation-detail-multiplier") || 0,
-            scale: Settings.instance.getSettingValue("s-scale-detail-multiplier") || 0
-        }
+            scale: Settings.instance.getSettingValue("s-scale-detail-multiplier") || 0,
+            immutability: Settings.instance.getSettingValue("s-immutability-detail-multiplier") || 0
+        };
 
         axios({
             method: 'post',
@@ -141,7 +156,8 @@ class Loader {
                         delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), multiplier.scale, depth),
                         directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), multiplier.scale, depth), 
                         absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), multiplier.scale, depth)
-                    }
+                    },
+                    immutability: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-immutability-threshold"), multiplier.immutability, depth)
                 }
             }
           })

@@ -193,10 +193,10 @@ let frames = [];
 let frameTransformation = new Unknown();
 
 let timeDuration = getYearDuration();
-let divisions = getRandomDivisions(timeDuration, objects.length);
+let step = Math.round(timeDuration / objects.length);
 
 for(let i = 0; i < objects.length; i++) {
-    frames.push(new Frame(objects[i], frameTransformation, timestamp, stepTime(divisions[i])));
+    frames.push(new Frame(objects[i], frameTransformation, timestamp, stepTime(step)));
 }
 
 
@@ -204,24 +204,6 @@ for(let i = 0; i < objects.length; i++) {
 function getYearDuration() {
     return Math.ceil(Utils.Milliseconds.YEAR);
 }
-
-
-function getRandomDivisions(timeDuration, numberFrames) {
-    let randomDurations = [];
-    let sum = 0.0;
-    for (let i = 0; i < numberFrames; i++) {
-        let random = Math.random() * 0.9 + 0.1;
-        sum += random;
-        randomDurations.push(random);
-    }
-    let newSum = 0.0;
-    for (let i = 0; i < numberFrames; i++) {
-        randomDurations[i] = Math.ceil(randomDurations[i] * timeDuration / sum);
-        newSum += randomDurations[i];
-    }
-    return randomDurations;
-}
-
 
 function stepTime(div) {
     timestamp += div;
