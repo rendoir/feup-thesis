@@ -7,8 +7,8 @@ const { Object, ObjectState } = require('./object');
 const { Translation, Orientation, Scale, Immutability, Unknown, Unimportant, Multiple } = require('./transformation');
 const Settings = require('./settings');
 
-//const SERVER_URL = "http://fctmost.inesctec.pt:80/stfx/";
-const SERVER_URL = "http://127.0.0.1:80/stfx/";
+const SERVER_URL = "http://fctmost.inesctec.pt:80/stfx/";
+//const SERVER_URL = "http://127.0.0.1:80/stfx/";
 
 class Loader {
 
@@ -73,7 +73,7 @@ class Loader {
                     break;
 
                 case "ROTATION":
-                    transformations.push(new Orientation(event.trigger.transformation));
+                    transformations.push(new Orientation(THREE.MathUtils.degToRad(event.trigger.transformation)));
                     break;
 
                 case "UNIMPORTANT":
