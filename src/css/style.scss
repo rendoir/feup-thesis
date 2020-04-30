@@ -4,6 +4,7 @@ $timeline-invisible-color: #e0e0e0;
 $timeline-visible-color: #93acfd;
 $timeline-zoom-visible-color: #5077f8;
 $timeline-zoom-invisible-color: #757575;
+$timeline-hover-color: #708ff5;
 $default-border: solid thin #444;
 $overlay-background: rgba(0, 0, 0, 0.1);
 
@@ -100,6 +101,10 @@ canvas {
     
     .frame-visible {
         background-color: $timeline-visible-color;
+    }
+
+    .frame-hover {
+        background-color: $timeline-hover-color;
     }
 
     .frame-zoom {

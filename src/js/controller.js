@@ -65,6 +65,26 @@ class Controller {
 
     setFrameDetailEvents(frameElement) {
         frameElement.onclick = this.onFrameClick.bind(this);
+        frameElement.onmouseover = this.onFrameMouseOver.bind(this);
+        frameElement.onmouseout = this.onFrameMouseOut.bind(this);
+    }
+
+    onFrameMouseOver(event) {
+        let frame = event.target.closest(".storyboard-frame");
+        let frameId = parseInt(frame.getAttribute("data-frame-id"));
+        let rowContainer = frame.closest(".row-container");
+        let frameTimeline = rowContainer.getElementsByClassName("frame-timeline")[0];
+        let frameTimelineItem = frameTimeline.children[frameId];
+        frameTimelineItem.classList.add("frame-hover");
+    }
+
+    onFrameMouseOut(event) {
+        let frame = event.target.closest(".storyboard-frame");
+        let frameId = parseInt(frame.getAttribute("data-frame-id"));
+        let rowContainer = frame.closest(".row-container");
+        let frameTimeline = rowContainer.getElementsByClassName("frame-timeline")[0];
+        let frameTimelineItem = frameTimeline.children[frameId];
+        frameTimelineItem.classList.remove("frame-hover");
     }
 
     onFrameClick(event) {
