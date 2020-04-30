@@ -145,17 +145,20 @@ class Loader {
                     translation: {
                         delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-delta"), multiplier.translation, depth),
                         directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-relative"), multiplier.translation, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), multiplier.translation, depth)
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-translation-absolute"), multiplier.translation, depth),
+                        noiseEpsilon: Settings.instance.getSettingValue("s-translation-noise")
                     },
                     rotation: {
                         delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-delta"), multiplier.rotation, depth),
                         directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-relative"), multiplier.rotation, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), multiplier.rotation, depth)
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-orientation-absolute"), multiplier.rotation, depth),
+                        noiseEpsilon: Settings.instance.getSettingValue("s-orientation-noise")
                     },
                     scale: {
                         delta: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-delta"), multiplier.scale, depth),
                         directedAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-relative"), multiplier.scale, depth), 
-                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), multiplier.scale, depth)
+                        absoluteAcc: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-scale-absolute"), multiplier.scale, depth),
+                        noiseEpsilon: Settings.instance.getSettingValue("s-scale-noise")
                     },
                     immutability: Loader.ApplyMultiplier(Settings.instance.getSettingValue("s-immutability-threshold"), multiplier.immutability, depth)
                 }
@@ -173,7 +176,7 @@ class Loader {
     }
 
     static ApplyMultiplier(value, mult, depth) {
-        if ( value === NaN ) 
+        if ( isNaN(value) || value === null ) 
             return null;
         return value * Math.pow(mult, depth);
     }

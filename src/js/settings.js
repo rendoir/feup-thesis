@@ -22,23 +22,26 @@ class SettingsManager {
         this.settings = {};
 
         // Event settings
-        this.settings["s-translation-delta"] = new Setting(1, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-translation-relative"] = new Setting(3, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-translation-absolute"] = new Setting(10, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-translation-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-delta"] = new Setting(10, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-relative"] = new Setting(50, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-absolute"] = new Setting(100, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-noise"] = new Setting(0.2, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-translation-detail-multiplier"] = new Setting(0.5, [this.groups["events"]], updateFloat, updateNumberHTML);
 
-        this.settings["s-orientation-delta"] = new Setting(0.05, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-orientation-relative"] = new Setting(0.3, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-delta"] = new Setting(15, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-relative"] = new Setting(25, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-orientation-absolute"] = new Setting(45, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-orientation-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-noise"] = new Setting(0.2, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-orientation-detail-multiplier"] = new Setting(0.5, [this.groups["events"]], updateFloat, updateNumberHTML);
 
         this.settings["s-scale-delta"] = new Setting(0.1, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-scale-relative"] = new Setting(0.3, [this.groups["events"]], updateFloat, updateNumberHTML);
         this.settings["s-scale-absolute"] = new Setting(2, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-scale-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-scale-noise"] = new Setting(0.01, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-scale-detail-multiplier"] = new Setting(0.5, [this.groups["events"]], updateFloat, updateNumberHTML);
 
         this.settings["s-immutability-threshold"] = new Setting(1000, [this.groups["events"]], updateFloat, updateNumberHTML);
-        this.settings["s-immutability-detail-multiplier"] = new Setting(0.75, [this.groups["events"]], updateFloat, updateNumberHTML);
+        this.settings["s-immutability-detail-multiplier"] = new Setting(0.5, [this.groups["events"]], updateFloat, updateNumberHTML);
 
         // Scene settings
         this.settings["s-vertex-mapping"] = new Setting(true, [this.groups["scenes"]], updateSwitch, updateSwitchHTML);
