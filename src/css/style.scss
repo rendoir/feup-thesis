@@ -172,6 +172,7 @@ canvas {
 /* Tooltips */
 .tooltip-inner {
     white-space: pre-line; // Allow line breaks in tooltips
+    max-width: 80vw !important;
 }
 
 /* Overlay */

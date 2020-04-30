@@ -151,7 +151,7 @@ let statesScale = [
 ];
 objectScale.setStates(statesScale);
 
-let scale = new Scale(new THREE.Vector2(0.75*4, 2*0.5));
+let scale = new Scale(new THREE.Vector2(0.4*4, 3.5*0.7));
 
 
 /* ----- IMMUTABILITY ----- */
