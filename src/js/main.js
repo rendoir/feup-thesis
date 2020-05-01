@@ -4,5 +4,5 @@ const Renderer = require('./renderer');
 const Loader = require('./loader');
 const SettingsManager = require('./settings');
 
-Loader.LoadFramesDemo(2);
+Loader.LoadFramesDemoJson(1);
 //Loader.LoadDataset();

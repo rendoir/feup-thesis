@@ -10,6 +10,9 @@ const Settings = require('./settings');
 const SERVER_URL = "http://fctmost.inesctec.pt:80/stfx/";
 //const SERVER_URL = "http://127.0.0.1:80/stfx/";
 
+//const APP_URL = "http://fctmost.inesctec.pt:8080";
+const APP_URL = "http://127.0.0.1:8080";
+
 class Loader {
 
     /** --------------- TEST CASES --------------- */
@@ -25,6 +28,24 @@ class Loader {
                 break;
         }
         Storyboard.instance.setFrames(frames);
+    }
+
+    static LoadFramesDemoJson(datasetNr) {
+        axios({
+            method: 'get',
+            headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
+            url: APP_URL + '/js/demos/dataset' + datasetNr + ".json",
+          })
+          .then(function (response) {
+            Settings.instance.settings["s-simplification"].value = true;
+            Settings.instance.settings["s-intermediate-states"].value = 1;
+        
+            let frames = Loader.ParseJson(response.data.dataset);
+            Storyboard.instance.setFrames(frames);
+          })
+          .catch(function (error) {
+              console.error(error);
+          });
     }
 
     /** ------------------------------------------ */
