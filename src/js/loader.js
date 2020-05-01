@@ -15,41 +15,6 @@ const APP_URL = "http://127.0.0.1:8080";
 
 class Loader {
 
-    /** --------------- TEST CASES --------------- */
-
-    static LoadFramesDemo(demoNr) {
-        let frames;
-        switch (demoNr) {
-            case 1:
-                frames = require('./demos/demo1');
-                break;
-            case 2:
-                frames = require('./demos/demo2');
-                break;
-        }
-        Storyboard.instance.setFrames(frames);
-    }
-
-    static LoadFramesDemoJson(datasetNr) {
-        axios({
-            method: 'get',
-            headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            url: APP_URL + '/js/demos/dataset' + datasetNr + ".json",
-          })
-          .then(function (response) {
-            Settings.instance.settings["s-simplification"].value = true;
-            Settings.instance.settings["s-intermediate-states"].value = datasetNr;
-        
-            let frames = Loader.ParseJson(response.data.dataset);
-            Storyboard.instance.setFrames(frames);
-          })
-          .catch(function (error) {
-              console.error(error);
-          });
-    }
-
-    /** ------------------------------------------ */
-
     static LoadDataset() {
         // Get initial set of frames
         Loader.SendRequest((frames) => {
@@ -219,6 +184,61 @@ class Loader {
               console.error(error);
           });
     }
+
+
+    /** --------------- TEST CASES --------------- */
+
+    static LoadFramesDemo(demoNr) {
+        let frames;
+        switch (demoNr) {
+            case 1:
+                frames = require('./demos/demo1');
+                break;
+            case 2:
+                frames = require('./demos/demo2');
+                break;
+        }
+        Storyboard.instance.setFrames(frames);
+    }
+
+    static LoadFramesDemoJson(datasetNr) {
+        axios({
+            method: 'get',
+            headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
+            url: APP_URL + '/js/demos/dataset' + datasetNr + ".json",
+          })
+          .then(function (response) {
+            Settings.instance.settings["s-simplification"].value = true;
+            Settings.instance.settings["s-intermediate-states"].value = datasetNr;
+            let frames = Loader.ParseJson(response.data.dataset);
+        
+            if ( datasetNr === 2 ) {
+                let children = [0, 3, 4];
+                children.forEach( (child) => {
+                    axios({
+                        method: 'get',
+                        headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
+                        url: APP_URL + '/js/demos/dataset' + datasetNr + "Child" + child + ".json",
+                      })
+                      .then(function (childResponse) {
+                        Settings.instance.settings["s-intermediate-states"].value = 1;
+                        let childFrames = Loader.ParseJson(childResponse.data.dataset);
+                        frames[child].childFrames = childFrames;
+                      })
+                      .catch(function (error) {
+                          console.error(error);
+                      });
+                });
+            }
+
+            Storyboard.instance.setFrames(frames);
+          })
+          .catch(function (error) {
+              console.error(error);
+          });
+    }
+
+    /** ------------------------------------------ */
 }
 
 module.exports = Loader;
