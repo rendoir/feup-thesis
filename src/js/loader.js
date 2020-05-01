@@ -38,7 +38,7 @@ class Loader {
           })
           .then(function (response) {
             Settings.instance.settings["s-simplification"].value = true;
-            Settings.instance.settings["s-intermediate-states"].value = 1;
+            Settings.instance.settings["s-intermediate-states"].value = datasetNr;
         
             let frames = Loader.ParseJson(response.data.dataset);
             Storyboard.instance.setFrames(frames);
