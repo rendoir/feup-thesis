@@ -212,9 +212,8 @@ class Loader {
             Settings.instance.settings["s-intermediate-states"].value = datasetNr;
             let frames = Loader.ParseJson(response.data.dataset);
         
-            if ( datasetNr === 2 ) {
-                let children = [0, 3, 4];
-                children.forEach( (child) => {
+            if ( response.data.children ) {
+                response.data.children.forEach( (child) => {
                     axios({
                         method: 'get',
                         headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},

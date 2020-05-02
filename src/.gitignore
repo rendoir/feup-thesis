@@ -3,3 +3,6 @@ node_modules/
 
 # Distribution directory
 dist/
+
+# Datasets
+js/demos/dataset*
