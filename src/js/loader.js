@@ -205,7 +205,7 @@ class Loader {
         axios({
             method: 'get',
             headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-            url: APP_URL + '/js/demos/dataset' + datasetNr + ".json",
+            url: APP_URL + '/js/demos/datasets/dataset' + datasetNr + ".json",
           })
           .then(function (response) {
             Settings.instance.settings["s-simplification"].value = true;
@@ -217,7 +217,7 @@ class Loader {
                     axios({
                         method: 'get',
                         headers: {'Access-Control-Allow-Headers': '*', 'Access-Control-Allow-Origin': '*'},
-                        url: APP_URL + '/js/demos/dataset' + datasetNr + "Child" + child + ".json",
+                        url: APP_URL + '/js/demos/datasets/dataset' + datasetNr + "Child" + child + ".json",
                       })
                       .then(function (childResponse) {
                         Settings.instance.settings["s-intermediate-states"].value = 1;
