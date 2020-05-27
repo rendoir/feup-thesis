@@ -1,0 +1,12 @@
+version: '3'
+
+services: 
+    visualization-service:
+        build: ./
+        command: yarn run dev
+        volumes:
+            - ./:/usr/src/app
+            - /usr/src/app/node_modules
+        container_name: visualization-service
+        ports: 
+            - 8080:8080

@@ -5,32 +5,35 @@ Master Thesis in Informatics and Computing Engineering
 ## Getting Started
 
 ### Prerequisites
-```
-yarn global add browserify watchify uglify-es node-sass
-```
+To run the application make sure you have `docker` and `docker-compose` installed.
+
 
 ### Running
 
 1. Clone the repository
 ```shell
 git clone https://github.com/rendoir/feup-thesis.git
-cd feup-thesis/
+cd feup-thesis/src/
 ```
 
-2. Install dependencies
-```shell
-cd src/
-yarn install
-```
+2. Run the application
+    - For deployment
+    ```shell
+    docker-compose up
+    ```
 
-3. Build the distribution bundle  
-```shell
-yarn run build
-```
+    - For development
+    ```shell
+    docker-compose -f docker-compose.dev.yml up
+    ```
 
-4. [Optional] For development, you can activate the watcher
-```shell
-yarn run watch
-```
+3. Open your browser
+    - In deployment
+    ```
+    http://127.0.0.1:8080/visualization/1/
+    ```
 
-5. In your browser, navigate to the file `src/index.html`
+    - In development
+    ```
+    http://127.0.0.1:8080/
+    ```
