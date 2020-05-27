@@ -17,5 +17,13 @@
     "jquery": "^3.4.1",
     "popper.js": "^1.16.1",
     "three": "^0.115.0"
+  },
+  "devDependencies": {
+    "browserify": "^16.5.1",
+    "cors": "^2.8.5",
+    "http-server": "^0.12.3",
+    "node-sass": "^4.14.1",
+    "uglify-es": "^3.3.9",
+    "watchify": "^3.11.1"
   }
 }

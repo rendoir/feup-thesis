@@ -8,10 +8,7 @@ const { Translation, Orientation, Scale, Immutability, Unknown, Unimportant, Mul
 const Settings = require('./settings');
 
 const SERVER_URL = "http://fctmost.inesctec.pt:80/stfx/";
-//const SERVER_URL = "http://127.0.0.1:80/stfx/";
-
-//const APP_URL = "http://fctmost.inesctec.pt:8080";
-const APP_URL = "http://127.0.0.1:8080";
+const APP_URL = window.location.href;
 
 class Loader {
 

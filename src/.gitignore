@@ -1,5 +1,6 @@
-# Dependency directories
+# Dependencies
 node_modules/
+yarn.lock
 
 # Distribution directory
 dist/
