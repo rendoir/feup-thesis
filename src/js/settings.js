@@ -12,7 +12,6 @@ class SettingsManager {
     initGroups() {
         this.groups = {};
 
-        // Scenes group
         this.groups["events"] = new Group(updateParameters);
         this.groups["scenes"] = new Group(rebuildScenes);
         this.groups["layout"] = new Group(updateLayout);
