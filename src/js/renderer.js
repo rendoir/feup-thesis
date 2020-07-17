@@ -121,6 +121,9 @@ class Renderer {
 
             // Add to visible frames
             this.visibleFrames.push(visibleFramesInRow);
+
+            // Hide buttons
+            this.hideButtons(rowWrapper.rowElement, info.start, end, row.length);
             
             // Update the previous row with the current
             previousRow = row;
@@ -242,6 +245,14 @@ class Renderer {
 
         if (shouldHide)
             itemLabel.style.display = 'none';
+    }
+
+    hideButtons(rowElement, start, end, rowLength) {
+        if (start === 0) 
+            rowElement.getElementsByClassName("btn-nav-left")[0].style.visibility = "hidden";
+        
+        if (end === rowLength) 
+            rowElement.getElementsByClassName("btn-nav-right")[0].style.visibility = "hidden";
     }
 
     rebuildScenes() {
