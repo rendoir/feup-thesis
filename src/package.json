@@ -4,11 +4,11 @@
     "watch-css": "node-sass -w css/style.scss dist/style.css",
     "watch": "yarn run watch-js & yarn run watch-css",
     "build-js": "browserify js/main.js | uglifyjs -mc > dist/bundle.js",
-    "build-css": "node-sass css/style.scss dist/style.css",
-    "build": "yarn run build-js | yarn run build-css",
+    "build-css": "node-sass css/style.scss dist/style.css --output-style compressed",
+    "build": "mkdir -p dist/ && yarn run build-js & yarn run build-css",
     "server": "http-server --cors --port=8080",
     "start": "yarn run build && yarn run server",
-    "dev": "yarn run watch & yarn run server"
+    "dev": "yarn run build && yarn run watch & yarn run server"
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.12.1",
@@ -25,5 +25,11 @@
     "node-sass": "^4.14.1",
     "uglify-es": "^3.3.9",
     "watchify": "^3.11.1"
-  }
+  },
+  "license" : "Apache-2.0",
+  "name": "stvs",
+  "version": "1.0",
+  "description": "Spatiotemporal visualization framework using static visual narratives",
+  "homepage": "https://github.com/rendoir/feup-thesis",
+  "contributors": [ { "name": "Daniel Marques" }, { "name": "Alexandre Carvalho" }, { "name": "Rui Rodrigues" }, { "name": "Edgar Carneiro" } ]
 }
